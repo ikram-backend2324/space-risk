@@ -42,6 +42,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "risk.middleware.LanguageMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -64,6 +65,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "risk.context_processors.site",
             ],
+            "builtins": ["risk.templatetags.risk_tags"],
         },
     },
 ]
@@ -89,6 +91,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "uz"
+# UI languages (Karakalpak has no Django catalog — see risk/i18n.py)
+LANGUAGES = [("uz", "Oʻzbekcha"), ("en", "English"), ("ru", "Русский"), ("kaa", "Qaraqalpaqsha")]
 TIME_ZONE = "Asia/Tashkent"
 USE_I18N = True
 USE_TZ = True

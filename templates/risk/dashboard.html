@@ -1,44 +1,44 @@
-{% extends "base.html" %}{% load static risk_tags humanize %}
-{% block title %}Dashboard{% endblock %}
+{% extends "base.html" %}{% load static %}
+{% block title %}{% t "nav.dashboard" %}{% endblock %}
 {% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">{% endblock %}
 
 {% block content %}
 <div class="page-head row-between reveal">
   <div>
-    <h1>Salom, <span class="grad-text">{{ user.first_name|default:user.username }}</span> 👋</h1>
-    <p>Oʻzbekiston hududlari boʻyicha xavf monitoringi · {% now "d.m.Y" %}</p>
+    <h1>{% t "dash.hello" %}, <span class="grad-text">{{ user.first_name|default:user.username }}</span> 👋</h1>
+    <p>{% t "dash.sub" %} · {% now "d.m.Y" %}</p>
   </div>
-  <a href="{% url 'risk:predict' %}" class="btn btn-primary btn-lg"><i data-lucide="radar"></i>Yangi prognoz</a>
+  <a href="{% url 'risk:predict' %}" class="btn btn-primary btn-lg"><i data-lucide="radar"></i>{% t "nav.new" %}</a>
 </div>
 
 <div class="grid grid-4">
-  <div class="card tilt stat reveal d1" style="--c:#22d3ee"><div class="ic"><i data-lucide="satellite"></i></div><div><b data-count="{{ total }}">0</b><span>Mening prognozlarim</span></div></div>
-  <div class="card tilt stat reveal d2" style="--c:#8b5cf6"><div class="ic"><i data-lucide="gauge"></i></div><div><b data-count="{{ avg_score }}">0</b><span>Oʻrtacha xavf indeksi</span></div></div>
-  <div class="card tilt stat reveal d3" style="--c:#f97316"><div class="ic"><i data-lucide="shield-alert"></i></div><div><b data-count="{{ critical }}">0</b><span>Yuqori / kritik</span></div></div>
-  <div class="card tilt stat reveal d4" style="--c:#22c55e"><div class="ic"><i data-lucide="map"></i></div><div><b data-count="{{ regions|length }}">0</b><span>Monitoringdagi hudud</span></div></div>
+  <div class="card tilt stat reveal d1" style="--c:#22d3ee"><div class="ic"><i data-lucide="satellite"></i></div><div><b data-count="{{ total }}">0</b><span>{% t "dash.my_forecasts" %}</span></div></div>
+  <div class="card tilt stat reveal d2" style="--c:#8b5cf6"><div class="ic"><i data-lucide="gauge"></i></div><div><b data-count="{{ avg_score }}">0</b><span>{% t "dash.avg_index" %}</span></div></div>
+  <div class="card tilt stat reveal d3" style="--c:#f97316"><div class="ic"><i data-lucide="shield-alert"></i></div><div><b data-count="{{ critical }}">0</b><span>{% t "dash.high_critical" %}</span></div></div>
+  <div class="card tilt stat reveal d4" style="--c:#22c55e"><div class="ic"><i data-lucide="map"></i></div><div><b data-count="{{ regions|length }}">0</b><span>{% t "dash.regions_monitored" %}</span></div></div>
 </div>
 
 <div class="split mt-3">
   <div class="card reveal">
     <div class="row-between" style="margin-bottom:14px">
-      <div class="card-title" style="margin:0"><i data-lucide="map"></i>Bazaviy xavf xaritasi</div>
-      <span class="chip chip-live">Sunʼiy yoʻldosh indekslari</span>
+      <div class="card-title" style="margin:0"><i data-lucide="map"></i>{% t "dash.map_title" %}</div>
+      <span class="chip chip-live">{% t "dash.map_chip" %}</span>
     </div>
     <div id="risk-map" class="map" style="height:560px"></div>
     <div class="map-legend">
-      <span><i style="background:#22c55e"></i>Past</span><span><i style="background:#eab308"></i>Oʻrtacha</span>
-      <span><i style="background:#f97316"></i>Yuqori</span><span><i style="background:#ef4444"></i>Kritik</span>
-      <span class="muted">· Doira oʻlchami — aholi soni</span>
+      <span><i style="background:#22c55e"></i>{{ 10|level_label }}</span><span><i style="background:#eab308"></i>{{ 40|level_label }}</span>
+      <span><i style="background:#f97316"></i>{{ 60|level_label }}</span><span><i style="background:#ef4444"></i>{{ 80|level_label }}</span>
+      <span class="muted">· {% t "dash.legend_size" %}</span>
     </div>
   </div>
   <div class="card reveal d1">
-    <div class="card-title"><i data-lucide="activity"></i>Hududlar reytingi</div>
+    <div class="card-title"><i data-lucide="activity"></i>{% t "dash.ranking" %}</div>
     <ul class="rank-list bars">
       {% for r in regions|slice:":8" %}
       <li>
         <span class="n">{{ forloop.counter|stringformat:"02d" }}</span>
         <div>
-          <a class="nm" href="{% url 'risk:predict' %}?region={{ r.slug }}">{{ r.name }}</a>
+          <a class="nm" href="{% url 'risk:predict' %}?region={{ r.slug }}">{{ r.display_name }}</a>
           <div class="hz">{% for h in r.top_hazards|slice:":2" %}{{ h.label }}{% if not forloop.last %} · {% endif %}{% endfor %}</div>
           <div class="bar"><span data-width="{{ r.composite }}" style="background:{{ r.color }}"></span></div>
         </div>
@@ -51,41 +51,41 @@
 
 <div class="grid grid-2 mt-3">
   <div class="card reveal">
-    <div class="card-title"><i data-lucide="radar"></i>Milliy xavf profili</div>
+    <div class="card-title"><i data-lucide="radar"></i>{% t "dash.national" %}</div>
     <div class="chart-box"><canvas id="national-chart"></canvas></div>
   </div>
   <div class="card reveal d1">
-    <div class="card-title"><i data-lucide="layers"></i>Prognozlarim daraja boʻyicha</div>
+    <div class="card-title"><i data-lucide="layers"></i>{% t "dash.by_level" %}</div>
     <div class="chart-box">{% if total %}<canvas id="levels-chart"></canvas>{% else %}
-      <div class="empty"><i data-lucide="orbit"></i><p>Hali prognoz yoʻq. Birinchisini yarating!</p></div>{% endif %}</div>
+      <div class="empty"><i data-lucide="orbit"></i><p>{% t "dash.no_forecasts_yet" %}</p></div>{% endif %}</div>
   </div>
 </div>
 
 <div class="card mt-3 reveal">
   <div class="row-between" style="margin-bottom:10px">
-    <div class="card-title" style="margin:0"><i data-lucide="history"></i>Soʻnggi prognozlar</div>
-    <a href="{% url 'risk:history' %}" class="btn btn-sm">Barchasi <i data-lucide="arrow-right"></i></a>
+    <div class="card-title" style="margin:0"><i data-lucide="history"></i>{% t "dash.recent" %}</div>
+    <a href="{% url 'risk:history' %}" class="btn btn-sm">{% t "dash.all" %} <i data-lucide="arrow-right"></i></a>
   </div>
   {% if recent %}
   <div class="table-wrap">
     <table class="table">
-      <thead><tr><th>Hudud</th><th>Muddat</th><th>Xavf</th><th>Manba</th><th>Sana</th><th></th></tr></thead>
+      <thead><tr><th>{% t "th.region" %}</th><th>{% t "th.horizon" %}</th><th>{% t "th.risk" %}</th><th>{% t "th.source" %}</th><th>{% t "th.date" %}</th><th></th></tr></thead>
       <tbody>
       {% for p in recent %}
         <tr>
-          <td><b>{{ p.region.name }}</b></td>
-          <td>{{ p.horizon_years }} yil → {{ p.target_year }}</td>
-          <td><span class="badge" style="--c:{{ p.color }}">{{ p.overall_score|floatformat:0 }} · {{ p.get_level_display }}</span></td>
-          <td class="muted small">{% if p.source == "ai" %}🤖 AI{% else %}⚙️ Ichki model{% endif %}</td>
-          <td class="muted small">{{ p.created_at|naturaltime }}</td>
-          <td><a href="{{ p.get_absolute_url }}" class="btn btn-sm">Ochish</a></td>
+          <td><b>{{ p.region.display_name }}</b></td>
+          <td>{{ p.horizon_years|years }} → {{ p.target_year }}</td>
+          <td><span class="badge" style="--c:{{ p.color }}">{{ p.overall_score|floatformat:0 }} · {{ p.level_label }}</span></td>
+          <td class="muted small">{% if p.source == "ai" %}🤖 {% t "src.ai" %}{% else %}⚙️ {% t "src.engine" %}{% endif %}</td>
+          <td class="muted small">{{ p.created_at|ago }}</td>
+          <td><a href="{{ p.get_absolute_url }}" class="btn btn-sm">{% t "btn.open" %}</a></td>
         </tr>
       {% endfor %}
       </tbody>
     </table>
   </div>
   {% else %}
-  <div class="empty"><i data-lucide="satellite"></i><p>Prognozlar hali yoʻq.</p><a href="{% url 'risk:predict' %}" class="btn btn-primary mt-2">Birinchi prognoz</a></div>
+  <div class="empty"><i data-lucide="satellite"></i><p>{% t "dash.empty" %}</p><a href="{% url 'risk:predict' %}" class="btn btn-primary mt-2">{% t "dash.first" %}</a></div>
   {% endif %}
 </div>
 {% endblock %}

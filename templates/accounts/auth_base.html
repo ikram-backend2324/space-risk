@@ -9,16 +9,17 @@
     <div class="auth-quote reveal">
       {% block quote %}{% endblock %}
       <div class="orbit-stats mt-3">
-        <div><b data-count="14">0</b><span>hudud</span></div>
-        <div><b data-count="9">0</b><span>xavf turi</span></div>
-        <div><b data-count="25">0</b><span>yillik prognoz</span></div>
+        <div><b data-count="14">0</b><span>{% t "auth.stat_regions" %}</span></div>
+        <div><b data-count="9">0</b><span>{% t "auth.stat_hazards" %}</span></div>
+        <div><b data-count="25">0</b><span>{% t "auth.stat_years" %}</span></div>
       </div>
     </div>
   </aside>
   <section class="auth-panel">
     <div class="auth-top">
-      <a href="{% url 'risk:landing' %}" class="icon-btn" title="Bosh sahifa" aria-label="Bosh sahifa"><i data-lucide="globe"></i></a>
-      <button class="icon-btn theme-toggle" data-theme-toggle type="button" aria-label="Rejimni almashtirish"><i data-lucide="moon" class="moon"></i><i data-lucide="sun" class="sun"></i></button>
+      {% include "partials/lang_switch.html" %}
+      <a href="{% url 'risk:landing' %}" class="icon-btn" title="{% t 'nav.home' %}" aria-label="{% t 'nav.home' %}"><i data-lucide="globe"></i></a>
+      <button class="icon-btn theme-toggle" data-theme-toggle type="button" aria-label="{% t 'nav.theme' %}" title="{% t 'nav.theme' %}"><i data-lucide="moon" class="moon"></i><i data-lucide="sun" class="sun"></i></button>
     </div>
     <div class="card card-glow auth-card reveal d1">
       {% block form %}{% endblock %}

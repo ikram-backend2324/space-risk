@@ -1,64 +1,64 @@
 {% extends "base.html" %}{% load static %}
-{% block title %}Hududning kelajakdagi xavfini oldindan aytuvchi AI{% endblock %}
+{% block title %}{{ SITE_TAGLINE }}{% endblock %}
 {% block background %}{% endblock %}
 {% block bg_script %}{% endblock %}
 
 {% block main %}
 <section class="hero">
-  <div id="globe" aria-label="Interaktiv 3D Yer shari"></div>
+  <div id="globe" aria-label="{% t 'landing.globe_label' %}"></div>
   <div class="container">
     <div class="hero-content">
-      <span class="chip reveal {% if AI_ONLINE %}chip-live{% else %}chip-off{% endif %}">UzCosmos · Sunʼiy yoʻldosh + AI</span>
+      <span class="chip reveal {% if AI_ONLINE %}chip-live{% else %}chip-off{% endif %}">{% t "landing.chip" %}</span>
       <h1 class="reveal d1">
-        <span class="line">Hududning</span>
-        <span class="line grad-text">kelajakdagi xavfini</span>
-        <span class="line">bugun koʻring.</span>
+        <span class="line">{% t "landing.h1_1" %}</span>
+        <span class="line grad-text">{% t "landing.h1_2" %}</span>
+        <span class="line">{% t "landing.h1_3" %}</span>
       </h1>
-      <p class="lead reveal d2">SPACE RISK Sentinel, Landsat, MODIS va GRACE sunʼiy yoʻldoshlari maʼlumotlarini sunʼiy intellekt bilan birlashtirib, Oʻzbekiston hududlari uchun zilzila, sel, qurgʻoqchilik, issiqlik toʻlqini va boshqa xavflarni <b>1–25 yil oldin</b> prognoz qiladi.</p>
+      <p class="lead reveal d2">{% t "landing.lead_html" %}</p>
       <div class="hero-cta reveal d3">
         {% if user.is_authenticated %}
-          <a href="{% url 'risk:predict' %}" class="btn btn-primary btn-lg"><i data-lucide="radar"></i>Prognoz yaratish</a>
-          <a href="{% url 'risk:dashboard' %}" class="btn btn-lg"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+          <a href="{% url 'risk:predict' %}" class="btn btn-primary btn-lg"><i data-lucide="radar"></i>{% t "landing.cta_forecast" %}</a>
+          <a href="{% url 'risk:dashboard' %}" class="btn btn-lg"><i data-lucide="layout-dashboard"></i>{% t "nav.dashboard" %}</a>
         {% else %}
-          <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg"><i data-lucide="rocket"></i>Bepul boshlash</a>
-          <a href="{% url 'accounts:login' %}" class="btn btn-lg"><i data-lucide="log-in"></i>Kirish</a>
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg"><i data-lucide="rocket"></i>{% t "landing.cta_free" %}</a>
+          <a href="{% url 'accounts:login' %}" class="btn btn-lg"><i data-lucide="log-in"></i>{% t "nav.login" %}</a>
         {% endif %}
       </div>
       <div class="hero-meta reveal d4">
-        <div><b data-count="{{ stats.regions }}">0</b><span>hudud monitoringda</span></div>
-        <div><b data-count="{{ stats.hazards }}">0</b><span>xavf turi</span></div>
-        <div><b><span data-count="{{ stats.population }}">0</span> mln</b><span>aholi qamrovi</span></div>
+        <div><b data-count="{{ stats.regions }}">0</b><span>{% t "landing.stat_regions" %}</span></div>
+        <div><b data-count="{{ stats.hazards }}">0</b><span>{% t "landing.stat_hazards" %}</span></div>
+        <div><b><span data-count="{{ stats.population }}">0</span> {% t "unit.mln" %}</b><span>{% t "landing.stat_population" %}</span></div>
       </div>
     </div>
   </div>
 
   <div class="card card-glow hero-hud reveal d4">
     <div class="row-between" style="margin-bottom:8px">
-      <b class="display" style="font-size:.95rem">ENG YUQORI XAVF</b>
+      <b class="display" style="font-size:.95rem">{% t "landing.hud_title" %}</b>
       <span class="chip chip-live">LIVE</span>
     </div>
     {% for r in top_regions %}
-      <div class="hud-line"><span>{{ r.name }}</span><span class="badge" style="--c:{{ r.color }}">{{ r.composite }}</span></div>
+      <div class="hud-line"><span>{{ r.display_name }}</span><span class="badge" style="--c:{{ r.color }}">{{ r.composite }}</span></div>
     {% endfor %}
   </div>
-  <div class="hero-hint"><i data-lucide="mouse"></i>Yer sharini aylantiring · hududni bosing</div>
+  <div class="hero-hint"><i data-lucide="mouse"></i>{% t "landing.hint" %}</div>
 </section>
 <div class="globe-tip" id="globe-tip"></div>
 
 <section class="section" id="features">
   <div class="container">
     <div class="section-head reveal">
-      <span class="chip"><i data-lucide="sparkles"></i>Imkoniyatlar</span>
-      <h2>Kosmosdan koʻrib, <span class="grad-text">oldindan</span> ogohlantiramiz</h2>
-      <p>Bir platformada — sunʼiy yoʻldosh monitoringi, AI prognozi va qaror qabul qilish uchun aniq tavsiyalar.</p>
+      <span class="chip"><i data-lucide="sparkles"></i>{% t "nav.features" %}</span>
+      <h2>{% t "landing.features_title_html" %}</h2>
+      <p>{% t "landing.features_sub" %}</p>
     </div>
     <div class="grid grid-3">
-      <div class="card tilt feature reveal d1"><div class="ic"><i data-lucide="satellite"></i></div><h3>Sunʼiy yoʻldosh maʼlumotlari</h3><p>Sentinel-1/2/5P, Landsat-9, MODIS, GRACE-FO va GPM missiyalaridan olingan indekslar asosida bazaviy xavf xaritasi.</p></div>
-      <div class="card tilt feature reveal d2"><div class="ic"><i data-lucide="brain"></i></div><h3>Generativ AI prognozi</h3><p>OpenRouter orqali ulanadigan katta til modellari hudud geografiyasi, tarixi va iqlim trendlarini tahlil qilib, kelajak ssenariysini tuzadi.</p></div>
-      <div class="card tilt feature reveal d3"><div class="ic"><i data-lucide="target"></i></div><h3>Amaliy tavsiyalar</h3><p>Har bir prognoz ustuvorlik darajasi bilan tavsiyalar, asosiy xavf omillari va monitoring manbalarini taqdim etadi.</p></div>
-      <div class="card tilt feature reveal d1"><div class="ic"><i data-lucide="layers"></i></div><h3>3D vizualizatsiya</h3><p>Interaktiv Yer shari, 3D xavf minoralari, radar va dinamik grafiklar — murakkab maʼlumot bir qarashda.</p></div>
-      <div class="card tilt feature reveal d2"><div class="ic"><i data-lucide="bot"></i></div><h3>AI tahlilchi bilan suhbat</h3><p>Prognoz boʻyicha savol bering: “Qaysi tuman eng zaif?”, “Qanday choralar birinchi navbatda?”</p></div>
-      <div class="card tilt feature reveal d3"><div class="ic"><i data-lucide="gauge"></i></div><h3>1–25 yillik ufq</h3><p>Qisqa muddatli tayyorgarlikdan tortib uzoq muddatli shaharsozlik va infratuzilma rejalashtirishgacha.</p></div>
+      <div class="card tilt feature reveal d1"><div class="ic"><i data-lucide="satellite"></i></div><h3>{% t "feat.sat.t" %}</h3><p>{% t "feat.sat.d" %}</p></div>
+      <div class="card tilt feature reveal d2"><div class="ic"><i data-lucide="brain"></i></div><h3>{% t "feat.ai.t" %}</h3><p>{% t "feat.ai.d" %}</p></div>
+      <div class="card tilt feature reveal d3"><div class="ic"><i data-lucide="target"></i></div><h3>{% t "feat.rec.t" %}</h3><p>{% t "feat.rec.d" %}</p></div>
+      <div class="card tilt feature reveal d1"><div class="ic"><i data-lucide="layers"></i></div><h3>{% t "feat.3d.t" %}</h3><p>{% t "feat.3d.d" %}</p></div>
+      <div class="card tilt feature reveal d2"><div class="ic"><i data-lucide="bot"></i></div><h3>{% t "feat.chat.t" %}</h3><p>{% t "feat.chat.d" %}</p></div>
+      <div class="card tilt feature reveal d3"><div class="ic"><i data-lucide="gauge"></i></div><h3>{% t "feat.horizon.t" %}</h3><p>{% t "feat.horizon.d" %}</p></div>
     </div>
   </div>
 </section>
@@ -66,9 +66,9 @@
 <section class="section" id="hazards">
   <div class="container">
     <div class="section-head reveal">
-      <span class="chip"><i data-lucide="shield-alert"></i>Xavf turlari</span>
-      <h2>9 ta tabiiy va ekologik tahdid</h2>
-      <p>Har bir xavf turi oʻz sunʼiy yoʻldosh manbalari orqali kuzatiladi.</p>
+      <span class="chip"><i data-lucide="shield-alert"></i>{% t "hz.chip" %}</span>
+      <h2>{% t "hz.title" %}</h2>
+      <p>{% t "hz.sub" %}</p>
     </div>
     <div class="grid grid-3">
       {% for code, h in hazards.items %}
@@ -84,19 +84,19 @@
 <section class="section" id="how">
   <div class="container split">
     <div class="reveal">
-      <span class="chip"><i data-lucide="orbit"></i>Qanday ishlaydi</span>
-      <h2 style="font-size:clamp(2rem,4vw,3rem);margin:14px 0 30px">Orbitadan — qarorgacha <span class="grad-text">4 qadam</span></h2>
+      <span class="chip"><i data-lucide="orbit"></i>{% t "nav.how" %}</span>
+      <h2 style="font-size:clamp(2rem,4vw,3rem);margin:14px 0 30px">{% t "how.title_html" %}</h2>
       <div class="steps stack" style="--gap:26px">
-        <div class="step"><h3>Hudud va ufqni tanlang</h3><p>Xaritada viloyatni bosing, 1, 5, 10 yoki 25 yillik prognoz muddatini belgilang.</p></div>
-        <div class="step mt-3"><h3>Sunʼiy yoʻldosh indekslari</h3><p>Tizim hududning bazaviy xavf indekslarini va iqlim trendlarini yuklaydi.</p></div>
-        <div class="step mt-3"><h3>AI modellashtirish</h3><p>Til modeli geografik kontekst bilan birga kelajak ssenariysini quradi.</p></div>
-        <div class="step mt-3"><h3>Hisobot va tavsiyalar</h3><p>3D vizualizatsiya, dinamika grafiklari va ustuvor choralar roʻyxati tayyor.</p></div>
+        <div class="step"><h3>{% t "how.s1.t" %}</h3><p>{% t "how.s1.d" %}</p></div>
+        <div class="step mt-3"><h3>{% t "how.s2.t" %}</h3><p>{% t "how.s2.d" %}</p></div>
+        <div class="step mt-3"><h3>{% t "how.s3.t" %}</h3><p>{% t "how.s3.d" %}</p></div>
+        <div class="step mt-3"><h3>{% t "how.s4.t" %}</h3><p>{% t "how.s4.d" %}</p></div>
       </div>
     </div>
     <div class="card card-glow reveal d2" style="display:grid;place-items:center;min-height:420px">
       <div style="text-align:center">
         <div class="radar" style="width:260px;height:260px"><i style="left:30%;top:28%"></i><i style="left:66%;top:58%;animation-delay:.5s"></i><i style="left:44%;top:72%;animation-delay:.9s"></i></div>
-        <h3 class="display">Real vaqt skaneri</h3>
+        <h3 class="display">{% t "how.scanner" %}</h3>
         <p class="muted small mt-1">Sentinel-2 · Landsat-9 · MODIS · GRACE-FO</p>
       </div>
     </div>
@@ -107,9 +107,9 @@
   <div class="container">
     <div class="card card-glow cta-band reveal">
       <img src="{% static 'img/logo-mark.svg' %}" alt="" width="84" height="84" style="filter:drop-shadow(0 0 24px rgba(34,211,238,.5))">
-      <h2 class="mt-2">Hududingiz kelajagini <span class="grad-text">bugun</span> himoya qiling</h2>
-      <p>Roʻyxatdan oʻting va birinchi AI prognozingizni bir daqiqada oling.</p>
-      <a href="{% if user.is_authenticated %}{% url 'risk:predict' %}{% else %}{% url 'accounts:register' %}{% endif %}" class="btn btn-primary btn-lg"><i data-lucide="rocket"></i>Boshlash</a>
+      <h2 class="mt-2">{% t "cta.title_html" %}</h2>
+      <p>{% t "cta.sub" %}</p>
+      <a href="{% if user.is_authenticated %}{% url 'risk:predict' %}{% else %}{% url 'accounts:register' %}{% endif %}" class="btn btn-primary btn-lg"><i data-lucide="rocket"></i>{% t "nav.start" %}</a>
     </div>
   </div>
 </section>

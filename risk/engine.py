@@ -10,47 +10,9 @@ import hashlib
 import math
 from datetime import date
 
-from .hazards import HAZARDS, LEVEL_LABELS, level_for
-
-RECOMMENDATIONS = {
-    "seismic": [
-        ("Binolarni seysmik audit qilish", "Maktab, shifoxona va koʻp qavatli uylarni 8–9 ballik zilzilaga chidamlilik boʻyicha tekshirish va kuchaytirish dasturini boshlash.", "high"),
-        ("InSAR monitoring", "Sentinel-1 radar maʼlumotlari asosida yer qobigʻi deformatsiyasini har 6 kunda kuzatish.", "medium"),
-    ],
-    "flood": [
-        ("Sel erta ogohlantirish tizimi", "Togʻ soylarida avtomatik datchiklar va GPM yogʻin prognozlarini birlashtirib, aholiga SMS-ogohlantirish yuborish.", "high"),
-        ("Suv omborlari xavfsizligi", "Toʻgʻonlar holatini sunʼiy yoʻldosh va dron orqali muntazam tekshirish.", "medium"),
-    ],
-    "drought": [
-        ("Tomchilatib sugʻorish", "Qishloq xoʻjaligida suvni tejovchi texnologiyalarni subsidiyalash va 30% gacha suv tejash.", "high"),
-        ("NDVI asosida hosil monitoringi", "MODIS/Sentinel-2 vegetatsiya indekslari bilan qurgʻoqchilikni 4–6 hafta oldin aniqlash.", "medium"),
-    ],
-    "heatwave": [
-        ("Shahar issiqlik orollarini kamaytirish", "Yashil zonalar, salqin tomlar va soya beruvchi infratuzilmani kengaytirish.", "high"),
-        ("Issiqlik harakat rejasi", "+40°C dan yuqori kunlarda aholini ogohlantirish va salqinlash markazlarini ochish.", "medium"),
-    ],
-    "landslide": [
-        ("Koʻchki xaritalash", "DEM va InSAR maʼlumotlari asosida xavfli yonbagʻirlarni aniqlab, qurilishni cheklash.", "high"),
-        ("Yonbagʻirlarni mustahkamlash", "Daraxt ekish va drenaj tizimlari orqali surilish xavfini kamaytirish.", "medium"),
-    ],
-    "dust": [
-        ("Orol tubini oʻrmonlashtirish", "Saksovul va boshqa choʻl oʻsimliklarini ekish orqali tuzli chang manbalarini barqarorlashtirish.", "high"),
-        ("Chang boʻroni prognozi", "Sentinel-5P va MODIS AOD maʼlumotlari bilan 48 soatlik chang prognozi xizmatini yoʻlga qoʻyish.", "medium"),
-    ],
-    "water": [
-        ("Suv resurslarini raqamli boshqarish", "GRACE-FO yer osti suv maʼlumotlari asosida kanallar va quduqlarda smart-hisoblagichlar joriy etish.", "high"),
-        ("Kanallarni betonlash", "Sugʻorish tarmogʻidagi filtratsiya yoʻqotishlarini kamaytirish.", "medium"),
-    ],
-    "air": [
-        ("Emissiyalarni nazorat qilish", "Sanoat korxonalarida uzluksiz emissiya monitoringi va Sentinel-5P NO₂ xaritalari bilan solishtirish.", "high"),
-        ("Toza transport", "Elektr jamoat transporti va velo-infratuzilmani kengaytirish.", "low"),
-    ],
-    "desertification": [
-        ("Yer degradatsiyasini toʻxtatish", "Shoʻrlangan yerlarni yuvish, almashlab ekish va choʻlga chidamli ekinlarni joriy etish.", "high"),
-        ("Landsat 40 yillik tahlil", "Yer qoplami oʻzgarishini arxiv tasvirlari orqali baholab, ustuvor hududlarni belgilash.", "low"),
-    ],
-}
-
+from . import i18n
+from .hazards import HAZARDS, hazard, level_for, level_label
+from .locale_content import MONTHS_SHORT, NARRATIVE, RECOMMENDATIONS
 
 def _jitter(*parts, spread=3.0):
     digest = hashlib.sha256("|".join(map(str, parts)).encode()).digest()
@@ -84,11 +46,12 @@ def composite(scores):
     return round(0.6 * sum(top) / len(top) + 0.4 * sum(vals) / len(vals), 1)
 
 
-def timeline_points(horizon):
-    """(label, years-from-now) pairs for the chart."""
-    start = date.today().year
+def timeline_points(horizon, lang=None, start=None):
+    """(label, years-from-start) pairs for the chart."""
+    start = start or date.today().year
     if horizon == 1:
-        return [(f"{start}", 0), ("+3 oy", 0.25), ("+6 oy", 0.5), ("+9 oy", 0.75), (f"{start + 1}", 1)]
+        mo = MONTHS_SHORT[lang or i18n.get_lang()]
+        return [(f"{start}", 0), (f"+3 {mo}", 0.25), (f"+6 {mo}", 0.5), (f"+9 {mo}", 0.75), (f"{start + 1}", 1)]
     steps = 5 if horizon <= 10 else 6
     points = []
     for i in range(steps):
@@ -120,53 +83,71 @@ def build_timeline(region, hazards, horizon, final_scores=None, overall_path=Non
     return out
 
 
-def forecast(region, hazards, horizon, notes=""):
-    hazards = [h for h in hazards if h in HAZARDS] or list(HAZARDS)
-    scores = {code: project(region.baseline.get(code, 30), code, horizon, region.slug) for code in hazards}
-    overall = composite(scores)
-    level = level_for(overall)
+def _decimal(value, lang):
+    text = f"{value:.1f}"
+    return text if lang == "en" else text.replace(".", ",")
+
+
+def narrative(region, scores, overall, horizon, start_year=None, lang=None):
+    """Summary, drivers, recommendations and sources in ``lang``, built from structured scores."""
+    lang = lang or i18n.get_lang()
+    scores = {c: v for c, v in scores.items() if c in HAZARDS}
     ranked = sorted(scores.items(), key=lambda kv: kv[1], reverse=True)
     top = ranked[:3]
-    target = date.today().year + horizon
+    year = (start_year or date.today().year) + horizon
+    region_name = _region_name(region, lang)
 
-    top_txt = ", ".join(f"{HAZARDS[c]['label'].lower()} ({s:.0f})" for c, s in top)
+    top_txt = ", ".join(f"{i18n.lower_first(hazard(c, lang)['label'], lang)} ({v:.0f})" for c, v in top)
+    summary = NARRATIVE["summary"][lang].format(
+        region=region_name, year=year, score=f"{overall:.0f}", level=level_label(level_for(overall), lang), top=top_txt)
     rising = [c for c, _ in ranked if HAZARDS[c]["trend"] >= 0.8][:2]
-    summary = (
-        f"{region.name} uchun {target}-yilgacha boʻlgan umumiy xavf indeksi {overall:.0f}/100 — "
-        f"“{LEVEL_LABELS[level]}” darajada. Eng kuchli tahdidlar: {top_txt}. "
-    )
     if rising:
-        summary += (
-            "Iqlim oʻzgarishi sababli " + " va ".join(HAZARDS[c]["label"].lower() for c in rising)
-            + " xavfi har yili ortib bormoqda, shu sababli moslashuv choralarini hozirdan rejalashtirish tavsiya etiladi."
-        )
+        names = i18n.join_and([i18n.lower_first(hazard(c, lang)["label"], lang) for c in rising], lang)
+        summary += " " + NARRATIVE["rising"][lang].format(list=names)
     else:
-        summary += "Xavflar asosan geologik xarakterga ega — tayyorgarlik va infratuzilma barqarorligi asosiy omil."
+        summary += " " + NARRATIVE["geological"][lang]
 
-    drivers = [f"{HAZARDS[c]['label']}: {HAZARDS[c]['desc'].lower()}" for c, _ in top]
-    drivers.append(region.description)
+    drivers = []
+    for c, _ in top:
+        h = hazard(c, lang)
+        drivers.append(f"{h['label']}: {i18n.lower_first(h['desc'], lang)}")
+    drivers.append(_region_desc(region, lang))
     if region.population > 2_500_000:
-        drivers.append(f"Aholi soni yuqori (~{region.population / 1e6:.1f} mln) — taʼsir ostidagi odamlar koʻp.")
+        drivers.append(NARRATIVE["population"][lang].format(n=_decimal(region.population / 1e6, lang)))
 
     recs = []
     for code, _ in top:
         for title, text, prio in RECOMMENDATIONS.get(code, [])[:2]:
-            recs.append({"title": title, "text": text, "priority": prio, "hazard": code})
-    recs = recs[:5]
+            recs.append({"title": title[lang], "text": text[lang], "priority": prio, "hazard": code})
 
     sources = []
     for code, _ in ranked:
-        for s in HAZARDS[code]["sources"]:
-            if s not in sources:
-                sources.append(s)
+        for src in HAZARDS[code]["sources"]:
+            if src not in sources:
+                sources.append(src)
 
+    return {"summary": summary, "drivers": drivers[:5], "recommendations": recs[:5], "satellite_sources": sources[:6]}
+
+
+def _region_name(region, lang):
+    from .hazards import region_text
+    return region_text(region.slug, region.name, region.description, lang)[0]
+
+
+def _region_desc(region, lang):
+    from .hazards import region_text
+    return region_text(region.slug, region.name, region.description, lang)[1]
+
+
+def forecast(region, hazards, horizon, notes="", lang=None):
+    lang = lang or i18n.get_lang()
+    hazards = [h for h in hazards if h in HAZARDS] or list(HAZARDS)
+    scores = {code: project(region.baseline.get(code, 30), code, horizon, region.slug) for code in hazards}
+    overall = composite(scores)
     return {
         "overall_score": overall,
         "confidence": max(55, 88 - horizon),
-        "summary": summary,
         "scores": scores,
         "timeline": build_timeline(region, hazards, horizon),
-        "drivers": drivers[:5],
-        "recommendations": recs,
-        "satellite_sources": sources[:6],
+        **narrative(region, scores, overall, horizon, lang=lang),
     }

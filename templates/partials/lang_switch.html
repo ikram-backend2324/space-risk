@@ -1,0 +1,12 @@
+<div class="dropdown lang-switch" data-dropdown>
+  <button class="icon-btn lang-btn" data-dropdown-trigger type="button" aria-label="{% t 'lang.label' %}" title="{% t 'lang.label' %}">
+    <i data-lucide="languages"></i><span>{{ LANG_SHORT }}</span>
+  </button>
+  <div class="dropdown-menu">
+    {% for code, name, short in LANGS %}
+      <a href="{% url 'risk:set_language' code %}?next={{ request.get_full_path|urlencode }}" class="{% if code == LANG %}current{% endif %}" lang="{{ code }}">
+        <b class="lang-code">{{ short }}</b>{{ name }}{% if code == LANG %}<i data-lucide="check" class="lang-check"></i>{% endif %}
+      </a>
+    {% endfor %}
+  </div>
+</div>

@@ -1,20 +1,20 @@
 {% extends "accounts/auth_base.html" %}
-{% block title %}Kirish{% endblock %}
+{% block title %}{% t "auth.login_title" %}{% endblock %}
 {% block quote %}
-  <span class="chip chip-live">Orbita faol</span>
-  <h2 class="mt-2">Qaytganingizdan xursandmiz, <span class="grad-text">kuzatuvchi</span>.</h2>
-  <p>Sunʼiy yoʻldoshlar sizning hududingizni kuzatishda davom etmoqda. Yangi prognozlar sizni kutmoqda.</p>
+  <span class="chip chip-live">{% t "auth.orbit_active" %}</span>
+  <h2 class="mt-2">{% t "auth.login_quote_html" %}</h2>
+  <p>{% t "auth.login_quote_sub" %}</p>
 {% endblock %}
 {% block form %}
-  <h1>Kirish</h1>
-  <p class="auth-sub">Hisobingizga kiring va xavf prognozlarini davom ettiring.</p>
+  <h1>{% t "auth.login_title" %}</h1>
+  <p class="auth-sub">{% t "auth.login_sub" %}</p>
   {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
   <form method="post" novalidate>
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ next }}">
     {% include "accounts/_field.html" with field=form.username icon="user" %}
     {% include "accounts/_field.html" with field=form.password icon="lock" password=True %}
-    <button class="btn btn-primary btn-lg btn-block mt-1" type="submit"><i data-lucide="log-in"></i>Kirish</button>
+    <button class="btn btn-primary btn-lg btn-block mt-1" type="submit"><i data-lucide="log-in"></i>{% t "nav.login" %}</button>
   </form>
-  <p class="auth-switch">Hisobingiz yoʻqmi? <a href="{% url 'accounts:register' %}">Roʻyxatdan oʻting</a></p>
+  <p class="auth-switch">{% t "auth.no_account" %} <a href="{% url 'accounts:register' %}">{% t "auth.register_link" %}</a></p>
 {% endblock %}

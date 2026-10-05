@@ -1,36 +1,36 @@
 {% extends "base.html" %}{% load static %}
-{% block title %}Yangi prognoz{% endblock %}
+{% block title %}{% t "nav.new" %}{% endblock %}
 {% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">{% endblock %}
 
 {% block content %}
 <div class="page-head reveal">
-  <span class="chip {% if AI_ONLINE %}chip-live{% else %}chip-off{% endif %}">{% if AI_ONLINE %}AI modeli ulangan{% else %}Ichki model rejimi{% endif %}</span>
-  <h1 class="mt-1">Yangi <span class="grad-text">xavf prognozi</span></h1>
-  <p>Hududni xaritadan tanlang, xavf turlari va prognoz muddatini belgilang.</p>
+  <span class="chip {% if AI_ONLINE %}chip-live{% else %}chip-off{% endif %}">{% if AI_ONLINE %}{% t "predict.chip_ai" %}{% else %}{% t "predict.chip_engine" %}{% endif %}</span>
+  <h1 class="mt-1">{% t "predict.title_html" %}</h1>
+  <p>{% t "predict.sub" %}</p>
 </div>
 
 <form method="post" id="predict-form" class="split">
   {% csrf_token %}
   <div class="card reveal">
-    <div class="card-title"><i data-lucide="map"></i>1. Hududni tanlang</div>
+    <div class="card-title"><i data-lucide="map"></i>{% t "predict.step1" %}</div>
     <div id="pick-map" class="map" style="height:520px"></div>
-    <p class="muted small mt-1">Marker ustiga bosing yoki pastdagi roʻyxatdan tanlang.</p>
+    <p class="muted small mt-1">{% t "predict.map_hint" %}</p>
   </div>
 
   <div class="card card-glow reveal d1">
     <div class="field">
-      <label for="region">Hudud</label>
+      <label for="region">{% t "th.region" %}</label>
       <select name="region" id="region" class="input" required>
-        <option value="" disabled {% if not selected %}selected{% endif %}>— Hududni tanlang —</option>
+        <option value="" disabled {% if not selected %}selected{% endif %}>{% t "predict.choose_region" %}</option>
         {% for r in regions %}
-          <option value="{{ r.slug }}" {% if r.slug == selected %}selected{% endif %}>{{ r.name }}</option>
+          <option value="{{ r.slug }}" {% if r.slug == selected %}selected{% endif %}>{{ r.display_name }}</option>
         {% endfor %}
       </select>
       <div id="region-info" class="muted small mt-1"></div>
     </div>
 
     <div class="field">
-      <label>2. Prognoz muddati</label>
+      <label>{% t "predict.step2" %}</label>
       <div class="segmented">
         {% for val, label in horizons %}
           <input type="radio" name="horizon" id="h{{ val }}" value="{{ val }}" {% if val == 5 %}checked{% endif %}>
@@ -41,8 +41,8 @@
 
     <div class="field">
       <div class="row-between" style="margin-bottom:8px">
-        <label style="margin:0">3. Xavf turlari</label>
-        <button type="button" class="btn btn-sm btn-ghost" id="toggle-all">Barchasini almashtirish</button>
+        <label style="margin:0">{% t "predict.step3" %}</label>
+        <button type="button" class="btn btn-sm btn-ghost" id="toggle-all">{% t "predict.toggle_all" %}</button>
       </div>
       <div class="hazard-grid">
         {% for code, h in hazards.items %}
@@ -55,19 +55,19 @@
     </div>
 
     <div class="field">
-      <label for="notes">4. Qoʻshimcha kontekst <span class="muted">(ixtiyoriy)</span></label>
-      <textarea name="notes" id="notes" class="input" maxlength="1000" placeholder="Masalan: yangi turar-joy massivi qurilishi rejalashtirilgan, suv ombori yaqinida..."></textarea>
+      <label for="notes">{% t "predict.step4" %} <span class="muted">{% t "predict.optional" %}</span></label>
+      <textarea name="notes" id="notes" class="input" maxlength="1000" placeholder="{% t 'predict.notes_ph' %}"></textarea>
     </div>
 
-    <button class="btn btn-primary btn-lg btn-block" type="submit"><i data-lucide="scan-line"></i>AI tahlilni boshlash</button>
+    <button class="btn btn-primary btn-lg btn-block" type="submit"><i data-lucide="scan-line"></i>{% t "predict.submit" %}</button>
   </div>
 </form>
 
 <div class="scan-overlay" id="scan">
   <div class="scan-text">
     <div class="radar"><i style="left:28%;top:30%"></i><i style="left:64%;top:60%;animation-delay:.4s"></i><i style="left:45%;top:76%;animation-delay:.8s"></i></div>
-    <h3 class="display">Orbitadan tahlil qilinmoqda…</h3>
-    <div class="scan-step" id="scan-step">Sunʼiy yoʻldoshlarga ulanmoqda…</div>
+    <h3 class="display">{% t "predict.scan_title" %}</h3>
+    <div class="scan-step" id="scan-step">{% t "js.scan1" %}</div>
     <div class="scan-progress"><span id="scan-bar"></span></div>
   </div>
 </div>
@@ -83,7 +83,7 @@
   const info = document.getElementById("region-info");
   function showInfo(slug) {
     const r = regions.find(x => x.slug === slug);
-    info.innerHTML = r ? `<span class="badge" style="--c:${r.color}">Bazaviy xavf ${r.score}/100</span> &nbsp;Asosiy: ${r.top.join(", ")}` : "";
+    info.innerHTML = r ? `<span class="badge" style="--c:${r.color}">${T("map_baseline")} ${r.score}/100</span> &nbsp;${T("map_main")}: ${r.top.join(", ")}` : "";
   }
   const rmap = createRiskMap(document.getElementById("pick-map"), regions, {
     onSelect: (slug) => { select.value = slug; showInfo(slug); select.classList.add("pulse"); },
@@ -97,18 +97,10 @@
     boxes.forEach(b => (b.checked = !allOn));
   });
 
-  const steps = [
-    "Sunʼiy yoʻldoshlarga ulanmoqda…",
-    "Sentinel-2 va Landsat-9 tasvirlari yuklanmoqda…",
-    "MODIS harorat va NDVI indekslari hisoblanmoqda…",
-    "GRACE-FO yer osti suvlari tahlili…",
-    "Sentinel-1 InSAR deformatsiya xaritasi…",
-    "AI modeli kelajak ssenariysini qurmoqda…",
-    "Tavsiyalar shakllantirilmoqda…",
-  ];
+  const steps = [1, 2, 3, 4, 5, 6, 7].map(i => T("scan" + i));
   document.getElementById("predict-form").addEventListener("submit", (e) => {
-    if (!select.value) { e.preventDefault(); toast("Avval hududni tanlang", "warning"); return; }
-    if (!document.querySelector('input[name="hazards"]:checked')) { e.preventDefault(); toast("Kamida bitta xavf turini tanlang", "warning"); return; }
+    if (!select.value) { e.preventDefault(); toast(T("pick_region"), "warning"); return; }
+    if (!document.querySelector('input[name="hazards"]:checked')) { e.preventDefault(); toast(T("pick_hazard"), "warning"); return; }
     document.getElementById("scan").classList.add("show");
     let i = 0;
     const stepEl = document.getElementById("scan-step"), bar = document.getElementById("scan-bar");

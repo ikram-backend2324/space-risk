@@ -1,5 +1,6 @@
 // Leaflet risk map of Uzbekistan with theme-aware tiles.
 window.createRiskMap = function (el, regions, opts = {}) {
+  const T = window.T || ((k) => k);
   const map = L.map(el, { zoomControl: true, scrollWheelZoom: false, attributionControl: true }).setView([41.2, 64.2], 6);
   const esri = (path) => `https://server.arcgisonline.com/ArcGIS/rest/services/${path}/MapServer/tile/{z}/{y}/{x}`;
   const attribution = "Tiles &copy; Esri — Maxar, Earthstar Geographics";
@@ -19,7 +20,7 @@ window.createRiskMap = function (el, regions, opts = {}) {
   refreshScheme();
   window.addEventListener("themechange", refreshScheme);
   satellite.addTo(map);
-  L.control.layers({ "🛰️ Sunʼiy yoʻldosh": satellite, "🗺️ Sxema": scheme }, null, { position: "topright" }).addTo(map);
+  L.control.layers({ [T("layer_sat")]: satellite, [T("layer_map")]: scheme }, null, { position: "topright" }).addTo(map);
   map.on("click", () => map.scrollWheelZoom.enable());
   map.on("mouseout", () => map.scrollWheelZoom.disable());
 
@@ -34,13 +35,13 @@ window.createRiskMap = function (el, regions, opts = {}) {
     });
     const m = L.marker([r.lat, r.lng], { icon, title: r.name }).addTo(map);
     const action = opts.onSelect
-      ? `<button class="btn btn-primary btn-sm mt-1" data-pick="${r.slug}">Tanlash</button>`
-      : `<a class="btn btn-primary btn-sm mt-1" href="${opts.predictUrl || "/predict/"}?region=${r.slug}">Prognoz qilish →</a>`;
+      ? `<button class="btn btn-primary btn-sm mt-1" data-pick="${r.slug}">${T("map_pick")}</button>`
+      : `<a class="btn btn-primary btn-sm mt-1" href="${opts.predictUrl || "/predict/"}?region=${r.slug}">${T("map_forecast")}</a>`;
     m.bindPopup(
       `<div style="min-width:190px"><b style="font-family:'Space Grotesk';font-size:1.05rem">${r.name}</b>
-       <div style="margin:6px 0"><span class="badge" style="--c:${r.color}">Bazaviy xavf ${r.score}/100</span></div>
-       <div class="muted small">Asosiy: ${r.top.join(", ")}</div>
-       <div class="muted small">Aholi: ${(r.population / 1e6).toFixed(2)} mln</div>${action}</div>`
+       <div style="margin:6px 0"><span class="badge" style="--c:${r.color}">${T("map_baseline")} ${r.score}/100</span></div>
+       <div class="muted small">${T("map_main")}: ${r.top.join(", ")}</div>
+       <div class="muted small">${T("map_population")}: ${(r.population / 1e6).toFixed(2)} ${T("mln")}</div>${action}</div>`
     );
     if (opts.onSelect) m.on("click", () => opts.onSelect(r.slug));
     markers[r.slug] = m;

@@ -1,13 +1,13 @@
 {% extends "accounts/auth_base.html" %}
-{% block title %}Roʻyxatdan oʻtish{% endblock %}
+{% block title %}{% t "auth.register_title" %}{% endblock %}
 {% block quote %}
-  <span class="chip"><i data-lucide="rocket"></i>Missiyaga qoʻshiling</span>
-  <h2 class="mt-2">Kelajak xavflarini <span class="grad-text">bugun</span> koʻring.</h2>
-  <p>Sunʼiy yoʻldosh maʼlumotlari va sunʼiy intellekt yordamida hududingiz uchun 25 yilgacha boʻlgan xavf prognozini oling.</p>
+  <span class="chip"><i data-lucide="rocket"></i>{% t "auth.join_chip" %}</span>
+  <h2 class="mt-2">{% t "auth.register_quote_html" %}</h2>
+  <p>{% t "auth.register_quote_sub" %}</p>
 {% endblock %}
 {% block form %}
-  <h1>Roʻyxatdan oʻtish</h1>
-  <p class="auth-sub">Bir daqiqada hisob yarating — bepul.</p>
+  <h1>{% t "auth.register_title" %}</h1>
+  <p class="auth-sub">{% t "auth.register_sub" %}</p>
   {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
   <form method="post" novalidate>
     {% csrf_token %}
@@ -20,7 +20,7 @@
     {% include "accounts/_field.html" with field=form.organization icon="building-2" %}
     {% include "accounts/_field.html" with field=form.password1 icon="lock" password=True meter=True %}
     {% include "accounts/_field.html" with field=form.password2 icon="lock" password=True %}
-    <button class="btn btn-primary btn-lg btn-block mt-1" type="submit"><i data-lucide="user-plus"></i>Hisob yaratish</button>
+    <button class="btn btn-primary btn-lg btn-block mt-1" type="submit"><i data-lucide="user-plus"></i>{% t "auth.create_account" %}</button>
   </form>
-  <p class="auth-switch">Hisobingiz bormi? <a href="{% url 'accounts:login' %}">Kirish</a></p>
+  <p class="auth-switch">{% t "auth.have_account" %} <a href="{% url 'accounts:login' %}">{% t "nav.login" %}</a></p>
 {% endblock %}

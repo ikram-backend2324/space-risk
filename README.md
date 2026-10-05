@@ -14,6 +14,13 @@ AI platform for UzCosmos. It forecasts natural and environmental hazard risk for
 - Result page with an animated gauge, 3D "risk constellation" towers, a timeline chart, a radar chart (today vs. future), recommendations, and an **AI analyst chat**
 - Built-in fallback engine: the app still works with no API key or if OpenRouter fails
 - Jazzmin admin panel (dark theme, branded logo, risk badges, chat history)
+- **4 languages:** Oʻzbekcha, English, Русский, Qaraqalpaqsha (language button in the top bar, remembered in a cookie)
+
+## Languages
+- Every interface string lives in `risk/locale_ui.py`; hazards, regions, recommendations and forecast text live in `risk/locale_content.py`. Each entry has `uz`, `en`, `ru` and `kaa` versions.
+- AI forecasts and chat answers are generated in the selected language. If you open a forecast in a different language, AI forecasts are translated by the AI (and cached), and built-in-model forecasts are regenerated in that language.
+- `/api/regions/?lang=kaa` returns region data in any of the 4 languages.
+- Django's own admin has no Karakalpak translation, so the admin panel shows Uzbek when Karakalpak is selected.
 
 ## Run locally
 ```bash

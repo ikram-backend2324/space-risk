@@ -2,7 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
-from .hazards import HAZARDS, HORIZONS, LEVEL_CHOICES, LEVEL_COLORS, level_for
+from .hazards import HAZARDS, HORIZONS, LEVEL_CHOICES, LEVEL_COLORS, hazard, level_for, level_label, region_text
+from .i18n import CODES as LANG_CODES
 
 
 class Region(models.Model):
@@ -27,6 +28,19 @@ class Region(models.Model):
         return self.name
 
     @property
+    def display_name(self):
+        """Region name in the active UI language."""
+        return region_text(self.slug, self.name, self.description)[0]
+
+    @property
+    def display_description(self):
+        return region_text(self.slug, self.name, self.description)[1]
+
+    @property
+    def level_label(self):
+        return level_label(self.level)
+
+    @property
     def composite(self):
         vals = [v for v in self.baseline.values() if isinstance(v, (int, float))]
         if not vals:
@@ -45,11 +59,11 @@ class Region(models.Model):
 
     def top_hazards(self, n=3):
         items = sorted(self.baseline.items(), key=lambda kv: kv[1], reverse=True)[:n]
-        return [{"code": k, "score": v, **HAZARDS.get(k, {})} for k, v in items]
+        return [{**hazard(k), "score": v} for k, v in items if k in HAZARDS]
 
     def as_map_dict(self):
         return {
-            "name": self.name, "slug": self.slug, "lat": self.lat, "lng": self.lng,
+            "name": self.display_name, "slug": self.slug, "lat": self.lat, "lng": self.lng,
             "population": self.population, "score": self.composite, "level": self.level,
             "color": self.color, "top": [h["label"] for h in self.top_hazards(2)],
         }
@@ -74,6 +88,9 @@ class Prediction(models.Model):
     recommendations = models.JSONField("Tavsiyalar", default=list)
     satellite_sources = models.JSONField("Sunʼiy yoʻldosh manbalari", default=list)
 
+    language = models.CharField("Til", max_length=5, choices=[(c, c) for c in LANG_CODES], default="uz")
+    translations = models.JSONField("AI tarjimalari", default=dict, blank=True,
+                                    help_text="Til kodi → tarjima qilingan xulosa, omillar va tavsiyalar")
     source = models.CharField("Manba", max_length=10, choices=SOURCE_CHOICES, default="engine")
     model_name = models.CharField("Model", max_length=120, blank=True)
     created_at = models.DateTimeField("Yaratilgan", auto_now_add=True)
@@ -94,17 +111,21 @@ class Prediction(models.Model):
         return LEVEL_COLORS.get(self.level, "#64748b")
 
     @property
+    def level_label(self):
+        return level_label(self.level)
+
+    @property
     def target_year(self):
         return self.created_at.year + self.horizon_years
 
     def hazard_rows(self):
         rows = []
         for code, score in sorted(self.scores.items(), key=lambda kv: kv[1], reverse=True):
-            meta = HAZARDS.get(code)
-            if not meta:
+            if code not in HAZARDS:
                 continue
-            rows.append({"code": code, "score": round(score), "level": level_for(score),
-                         "level_color": LEVEL_COLORS[level_for(score)], **meta})
+            lvl = level_for(score)
+            rows.append({**hazard(code), "score": round(score), "level": lvl,
+                         "level_label": level_label(lvl), "level_color": LEVEL_COLORS[lvl]})
         return rows
 
 

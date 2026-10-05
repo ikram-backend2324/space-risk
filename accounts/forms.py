@@ -2,46 +2,89 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
+from risk.i18n import t
+
 from .models import Profile
 
 User = get_user_model()
 
+# Django error code → UI key. Field-specific overrides take precedence.
+ERROR_KEYS = {
+    "required": "err.required",
+    "password_mismatch": "err.password_mismatch",
+    "password_too_short": "err.password_too_short",
+    "password_too_common": "err.password_too_common",
+    "password_entirely_numeric": "err.password_entirely_numeric",
+    "password_too_similar": "err.password_too_similar",
+    "invalid_login": "err.invalid_login",
+    "inactive": "err.inactive",
+    "max_length": "err.max_length",
+    "email_taken": "err.email_taken",
+}
+FIELD_ERROR_KEYS = {
+    ("email", "invalid"): "err.invalid_email",
+    ("username", "invalid"): "err.username_invalid",
+    ("username", "unique"): "err.username_taken",
+}
 
-class StyledMixin:
-    """Adds the site's input class and placeholders to every field."""
 
+class LocalizedMixin:
+    """Translates labels/placeholders and replaces Django's error messages by error code."""
+
+    labels = {}
     placeholders = {}
 
-    def _style(self):
+    def _localize_fields(self):
         for name, field in self.fields.items():
+            if name in self.labels:
+                field.label = t(self.labels[name])
+            field.help_text = ""
             field.widget.attrs.setdefault("class", "input")
-            field.widget.attrs.setdefault("placeholder", self.placeholders.get(name, field.label or ""))
+            ph = self.placeholders.get(name, self.labels.get(name))
+            if ph:
+                field.widget.attrs["placeholder"] = t(ph)
+
+    def full_clean(self):
+        super().full_clean()
+        if not self._errors:
+            return
+        for name in list(self._errors):
+            localized = []
+            for err in self._errors[name].as_data():
+                key = FIELD_ERROR_KEYS.get((name, err.code)) or ERROR_KEYS.get(err.code)
+                params = err.params if isinstance(err.params, dict) else {}
+                localized.append(t(key, **params) if key else t("err.generic"))
+            self._errors[name] = self.error_class(localized, renderer=self.renderer)
 
 
-class LoginForm(StyledMixin, AuthenticationForm):
-    placeholders = {"username": "Foydalanuvchi nomi", "password": "Parol"}
+class LoginForm(LocalizedMixin, AuthenticationForm):
+    labels = {"username": "field.username", "password": "field.password"}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["username"].label = "Foydalanuvchi nomi"
-        self.fields["password"].label = "Parol"
-        self._style()
+        self._localize_fields()
 
 
-class RegisterForm(StyledMixin, UserCreationForm):
-    first_name = forms.CharField(label="Ism", max_length=60)
-    last_name = forms.CharField(label="Familiya", max_length=60, required=False)
-    email = forms.EmailField(label="Email")
-    organization = forms.CharField(label="Tashkilot", max_length=160, required=False)
+class RegisterForm(LocalizedMixin, UserCreationForm):
+    first_name = forms.CharField(max_length=60)
+    last_name = forms.CharField(max_length=60, required=False)
+    email = forms.EmailField()
+    organization = forms.CharField(max_length=160, required=False)
 
+    labels = {
+        "first_name": "field.first_name",
+        "last_name": "field.last_name",
+        "username": "field.username",
+        "email": "field.email",
+        "organization": "field.organization",
+        "password1": "field.password",
+        "password2": "field.password_confirm",
+    }
     placeholders = {
-        "first_name": "Ism",
-        "last_name": "Familiya",
-        "username": "Foydalanuvchi nomi",
-        "email": "email@misol.uz",
-        "organization": "Tashkilot (ixtiyoriy)",
-        "password1": "Parol (kamida 8 belgi)",
-        "password2": "Parolni takrorlang",
+        "email": "field.email_ph",
+        "organization": "field.organization_ph",
+        "password1": "field.password_ph",
+        "password2": "field.password_repeat_ph",
     }
 
     class Meta:
@@ -50,19 +93,13 @@ class RegisterForm(StyledMixin, UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["username"].label = "Foydalanuvchi nomi"
-        self.fields["username"].help_text = ""
-        self.fields["password1"].label = "Parol"
-        self.fields["password1"].help_text = ""
-        self.fields["password2"].label = "Parolni tasdiqlang"
-        self.fields["password2"].help_text = ""
+        self._localize_fields()
         self.fields["password1"].widget.attrs["data-pw-meter"] = "#pw-meter"
-        self._style()
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower()
         if User.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError("Bu email bilan allaqachon ro'yxatdan o'tilgan.")
+            raise forms.ValidationError("email taken", code="email_taken")
         return email
 
     def save(self, commit=True):
@@ -78,10 +115,18 @@ class RegisterForm(StyledMixin, UserCreationForm):
         return user
 
 
-class ProfileForm(StyledMixin, forms.ModelForm):
-    first_name = forms.CharField(label="Ism", max_length=60)
-    last_name = forms.CharField(label="Familiya", max_length=60, required=False)
-    email = forms.EmailField(label="Email")
+class ProfileForm(LocalizedMixin, forms.ModelForm):
+    first_name = forms.CharField(max_length=60)
+    last_name = forms.CharField(max_length=60, required=False)
+    email = forms.EmailField()
+
+    labels = {
+        "first_name": "field.first_name",
+        "last_name": "field.last_name",
+        "email": "field.email",
+        "organization": "field.organization",
+        "position": "field.position",
+    }
 
     class Meta:
         model = Profile
@@ -95,7 +140,7 @@ class ProfileForm(StyledMixin, forms.ModelForm):
             self.fields["last_name"].initial = user.last_name
             self.fields["email"].initial = user.email
         self.order_fields(["first_name", "last_name", "email", "organization", "position"])
-        self._style()
+        self._localize_fields()
 
     def save(self, commit=True):
         profile = super().save(commit=False)

@@ -1,10 +1,10 @@
 {% load static %}<!doctype html>
-<html lang="uz" data-theme="dark">
+<html lang="{{ LANG }}" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ SITE_NAME }}{% endblock %} · {{ SITE_NAME }}</title>
-  <meta name="description" content="{{ SITE_NAME }} — {{ SITE_TAGLINE }}. Sunʼiy yoʻldosh maʼlumotlari va AI asosida hududiy xavf prognozi.">
+  <meta name="description" content="{{ SITE_NAME }} — {{ SITE_TAGLINE }}. {% t "site.description" %}">
   <meta name="theme-color" content="#050816">
   <link rel="icon" type="image/svg+xml" href="{% static 'img/logo-mark.svg' %}">
   <link rel="apple-touch-icon" href="{% static 'img/logo-mark.png' %}">
@@ -50,6 +50,8 @@
 
   {% block footer %}{% include "partials/footer.html" %}{% endblock %}
 
+  {{ JS_I18N|json_script:"i18n-data" }}
+  <script>window.T = (function () { var d = JSON.parse(document.getElementById("i18n-data").textContent); return function (k) { return d[k] || k; }; })();</script>
   <script src="{% static 'vendor/lucide.min.js' %}"></script>
   <script src="{% static 'js/app.js' %}"></script>
   {% block bg_script %}<script type="module" src="{% static 'js/space-bg.js' %}"></script>{% endblock %}

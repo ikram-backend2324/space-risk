@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Profil{% endblock %}
+{% block title %}{% t "nav.profile" %}{% endblock %}
 {% block content %}
 <div class="page-head reveal">
-  <h1>Profil</h1>
-  <p>Shaxsiy maʼlumotlaringizni boshqaring.</p>
+  <h1>{% t "nav.profile" %}</h1>
+  <p>{% t "profile.sub" %}</p>
 </div>
 <div class="split-rev">
   <div class="card card-glow reveal" style="text-align:center">
@@ -11,13 +11,13 @@
     <h2 style="font-size:1.4rem">{{ user.get_full_name|default:user.username }}</h2>
     <p class="muted">@{{ user.username }}{% if profile.organization %} · {{ profile.organization }}{% endif %}</p>
     <div class="grid grid-2 mt-3">
-      <div class="card" style="padding:16px"><b class="display" style="font-size:1.8rem" data-count="{{ stats.total }}">0</b><div class="muted small">prognoz</div></div>
-      <div class="card" style="padding:16px"><b class="display" style="font-size:1.8rem;color:#f97316" data-count="{{ stats.critical }}">0</b><div class="muted small">yuqori xavfli</div></div>
+      <div class="card" style="padding:16px"><b class="display" style="font-size:1.8rem" data-count="{{ stats.total }}">0</b><div class="muted small">{% t "profile.forecasts" %}</div></div>
+      <div class="card" style="padding:16px"><b class="display" style="font-size:1.8rem;color:#f97316" data-count="{{ stats.critical }}">0</b><div class="muted small">{% t "profile.high_risk" %}</div></div>
     </div>
-    <p class="muted small mt-3">Aʼzo boʻlgan sana: {{ user.date_joined|date:"d.m.Y" }}</p>
+    <p class="muted small mt-3">{% t "profile.joined" %}: {{ user.date_joined|date:"d.m.Y" }}</p>
   </div>
   <div class="card reveal d1">
-    <div class="card-title"><i data-lucide="user"></i>Maʼlumotlarni tahrirlash</div>
+    <div class="card-title"><i data-lucide="user"></i>{% t "profile.edit" %}</div>
     <form method="post" novalidate>
       {% csrf_token %}
       <div class="grid grid-2" style="gap:0 14px">
@@ -25,7 +25,7 @@
           <div class="field"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>
         {% endfor %}
       </div>
-      <button class="btn btn-primary" type="submit"><i data-lucide="badge-check"></i>Saqlash</button>
+      <button class="btn btn-primary" type="submit"><i data-lucide="badge-check"></i>{% t "profile.save" %}</button>
     </form>
   </div>
 </div>

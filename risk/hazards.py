@@ -1,86 +1,68 @@
 """Static reference data: hazard types, risk levels, Uzbekistan regions."""
 
-# code -> label, lucide icon, colour, annual trend (index points / year under climate change),
-#         satellite sources used to observe it
+# code -> lucide icon, colour, annual trend (index points / year under climate change),
+#         satellite sources used to observe it. Labels/descriptions: locale_content.HAZARD_TEXT
 HAZARDS = {
     "seismic": {
-        "label": "Zilzila",
         "icon": "activity",
         "color": "#f43f5e",
         "trend": 0.0,
         "sources": ["Sentinel-1 InSAR", "GNSS tarmogʻi"],
-        "desc": "Seysmik faollik va yer qobigʻi deformatsiyasi",
     },
     "flood": {
-        "label": "Sel va toshqin",
         "icon": "waves",
         "color": "#3b82f6",
         "trend": 0.45,
         "sources": ["Sentinel-1 SAR", "GPM yogʻingarchilik"],
-        "desc": "Togʻ sellari, daryo toshqinlari, suv omborlari xavfi",
     },
     "drought": {
-        "label": "Qurgʻoqchilik",
         "icon": "sun",
         "color": "#f59e0b",
         "trend": 0.9,
         "sources": ["MODIS NDVI", "SMAP tuproq namligi"],
-        "desc": "Yogʻin tanqisligi va oʻsimliklar stressi",
     },
     "heatwave": {
-        "label": "Issiqlik toʻlqini",
         "icon": "thermometer-sun",
         "color": "#ef4444",
         "trend": 1.1,
         "sources": ["Landsat-9 TIRS", "MODIS LST"],
-        "desc": "Ekstremal harorat va shahar issiqlik orollari",
     },
     "landslide": {
-        "label": "Koʻchki va surilish",
         "icon": "mountain",
         "color": "#a16207",
         "trend": 0.3,
         "sources": ["Sentinel-1 InSAR", "SRTM DEM"],
-        "desc": "Yonbagʻir surilishi, qor koʻchkilari",
     },
     "dust": {
-        "label": "Chang-tuz boʻronlari",
         "icon": "wind",
         "color": "#d97706",
         "trend": 0.7,
         "sources": ["Sentinel-5P", "MODIS AOD"],
-        "desc": "Orol tubidan koʻtarilgan tuzli changlar",
     },
     "water": {
-        "label": "Suv tanqisligi",
         "icon": "droplets",
         "color": "#06b6d4",
         "trend": 1.0,
         "sources": ["GRACE-FO", "Sentinel-2 suv yuzasi"],
-        "desc": "Yer osti va yer usti suv zaxiralari kamayishi",
     },
     "air": {
-        "label": "Havo ifloslanishi",
         "icon": "factory",
         "color": "#8b5cf6",
         "trend": 0.5,
         "sources": ["Sentinel-5P TROPOMI", "Yer usti stansiyalari"],
-        "desc": "PM2.5, NO₂, SO₂ konsentratsiyalari",
     },
     "desertification": {
-        "label": "Choʻllanish",
         "icon": "tent-tree",
         "color": "#ca8a04",
         "trend": 0.8,
         "sources": ["Landsat arxivi", "Sentinel-2 NDVI"],
-        "desc": "Yer degradatsiyasi va shoʻrlanish",
     },
 }
 
-HAZARD_CHOICES = [(code, h["label"]) for code, h in HAZARDS.items()]
 
 HORIZONS = [(1, "1 yil"), (5, "5 yil"), (10, "10 yil"), (25, "25 yil")]
 
+# code, admin label (Uzbek), colour, threshold — user-facing labels come from locale_content
 LEVELS = [
     ("low", "Past", "#22c55e", 0),
     ("moderate", "Oʻrtacha", "#eab308", 35),
@@ -90,6 +72,54 @@ LEVELS = [
 LEVEL_CHOICES = [(code, label) for code, label, _, _ in LEVELS]
 LEVEL_COLORS = {code: color for code, _, color, _ in LEVELS}
 LEVEL_LABELS = {code: label for code, label, _, _ in LEVELS}
+
+
+def level_label(code, lang=None):
+    from .i18n import get_lang
+    from .locale_content import LEVEL_TEXT
+
+    return LEVEL_TEXT.get(code, {}).get(lang or get_lang(), code)
+
+
+def priority_label(code, lang=None):
+    from .i18n import get_lang
+    from .locale_content import PRIORITY_TEXT
+
+    return PRIORITY_TEXT.get(code, PRIORITY_TEXT["medium"]).get(lang or get_lang())
+
+
+def hazard(code, lang=None):
+    """HAZARDS[code] plus localized ``label`` and ``desc``."""
+    from .i18n import get_lang
+    from .locale_content import HAZARD_TEXT
+
+    lang = lang or get_lang()
+    label, desc = HAZARD_TEXT[code]
+    return {**HAZARDS[code], "code": code, "label": label[lang], "desc": desc[lang],
+            "sources": [source_label(s, lang) for s in HAZARDS[code]["sources"]]}
+
+
+def hazards(lang=None):
+    return {code: hazard(code, lang) for code in HAZARDS}
+
+
+def source_label(name, lang=None):
+    from .i18n import get_lang
+    from .locale_content import SOURCE_TEXT
+
+    entry = SOURCE_TEXT.get(name)
+    return entry[lang or get_lang()] if entry else name
+
+
+def region_text(slug, fallback_name="", fallback_desc="", lang=None):
+    from .i18n import get_lang
+    from .locale_content import REGION_TEXT
+
+    entry = REGION_TEXT.get(slug)
+    if not entry:
+        return fallback_name, fallback_desc
+    lang = lang or get_lang()
+    return entry[0][lang], entry[1][lang]
 
 
 def level_for(score):

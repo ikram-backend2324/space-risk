@@ -4,6 +4,8 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
+from risk.i18n import t
+
 from .forms import LoginForm, ProfileForm, RegisterForm
 from .models import Profile
 
@@ -14,7 +16,7 @@ class LoginView(auth_views.LoginView):
     redirect_authenticated_user = True
 
     def form_valid(self, form):
-        messages.success(self.request, f"Xush kelibsiz, {form.get_user().first_name or form.get_user().username}! 🚀")
+        messages.success(self.request, t("msg.welcome", name=form.get_user().first_name or form.get_user().username))
         return super().form_valid(form)
 
 
@@ -29,7 +31,7 @@ def register(request):
     if request.method == "POST" and form.is_valid():
         user = form.save()
         login(request, user)
-        messages.success(request, "Hisob yaratildi! SPACE RISK orbitasiga xush kelibsiz 🛰️")
+        messages.success(request, t("msg.registered"))
         return redirect("risk:dashboard")
     return render(request, "accounts/register.html", {"form": form})
 
@@ -40,7 +42,7 @@ def profile(request):
     form = ProfileForm(request.POST or None, instance=prof, user=request.user)
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, "Profil yangilandi.")
+        messages.success(request, t("msg.profile_saved"))
         return redirect("accounts:profile")
     stats = {
         "total": request.user.predictions.count(),

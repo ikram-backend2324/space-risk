@@ -7,24 +7,25 @@
 
   <nav class="nav-links">
     {% if user.is_authenticated %}
-      <a href="{% url 'risk:dashboard' %}" class="{% if u == 'dashboard' %}active{% endif %}"><i data-lucide="layout-dashboard"></i>Dashboard</a>
-      <a href="{% url 'risk:predict' %}" class="{% if u == 'predict' %}active{% endif %}"><i data-lucide="radar"></i>Yangi prognoz</a>
-      <a href="{% url 'risk:history' %}" class="{% if u == 'history' or u == 'detail' %}active{% endif %}"><i data-lucide="history"></i>Tarix</a>
-      {% if user.is_staff %}<a href="{% url 'admin:index' %}"><i data-lucide="shield"></i>Admin</a>{% endif %}
+      <a href="{% url 'risk:dashboard' %}" class="{% if u == 'dashboard' %}active{% endif %}"><i data-lucide="layout-dashboard"></i>{% t "nav.dashboard" %}</a>
+      <a href="{% url 'risk:predict' %}" class="{% if u == 'predict' %}active{% endif %}"><i data-lucide="radar"></i>{% t "nav.new" %}</a>
+      <a href="{% url 'risk:history' %}" class="{% if u == 'history' or u == 'detail' %}active{% endif %}"><i data-lucide="history"></i>{% t "nav.history" %}</a>
+      {% if user.is_staff %}<a href="{% url 'admin:index' %}"><i data-lucide="shield"></i>{% t "nav.admin" %}</a>{% endif %}
     {% else %}
-      <a href="{% url 'risk:landing' %}#features"><i data-lucide="sparkles"></i>Imkoniyatlar</a>
-      <a href="{% url 'risk:landing' %}#hazards"><i data-lucide="shield-alert"></i>Xavflar</a>
-      <a href="{% url 'risk:landing' %}#how"><i data-lucide="satellite"></i>Qanday ishlaydi</a>
+      <a href="{% url 'risk:landing' %}#features"><i data-lucide="sparkles"></i>{% t "nav.features" %}</a>
+      <a href="{% url 'risk:landing' %}#hazards"><i data-lucide="shield-alert"></i>{% t "nav.hazards" %}</a>
+      <a href="{% url 'risk:landing' %}#how"><i data-lucide="satellite"></i>{% t "nav.how" %}</a>
     {% endif %}
   </nav>
 
   <div class="nav-actions">
-    <button class="icon-btn theme-toggle" data-theme-toggle type="button" aria-label="Rejimni almashtirish" title="Kun / tun rejimi">
+    {% include "partials/lang_switch.html" %}
+    <button class="icon-btn theme-toggle" data-theme-toggle type="button" aria-label="{% t 'nav.theme' %}" title="{% t 'nav.theme' %}">
       <i data-lucide="moon" class="moon"></i><i data-lucide="sun" class="sun"></i>
     </button>
     {% if user.is_authenticated %}
       <div class="dropdown" data-dropdown>
-        <button class="avatar" data-dropdown-trigger type="button" style="border:0;cursor:pointer" aria-label="Profil menyusi">
+        <button class="avatar" data-dropdown-trigger type="button" style="border:0;cursor:pointer" aria-label="{% t 'nav.profile_menu' %}">
           {{ user.profile.initials|default:user.username|slice:":2"|upper }}
         </button>
         <div class="dropdown-menu">
@@ -32,19 +33,19 @@
             <b>{{ user.get_full_name|default:user.username }}</b>
             <div class="muted small">{{ user.email|default:"" }}</div>
           </div>
-          <a href="{% url 'accounts:profile' %}"><i data-lucide="user"></i>Profil</a>
-          <a href="{% url 'risk:history' %}"><i data-lucide="file-clock"></i>Prognozlarim</a>
-          {% if user.is_staff %}<a href="{% url 'admin:index' %}"><i data-lucide="settings"></i>Admin panel</a>{% endif %}
+          <a href="{% url 'accounts:profile' %}"><i data-lucide="user"></i>{% t "nav.profile" %}</a>
+          <a href="{% url 'risk:history' %}"><i data-lucide="file-clock"></i>{% t "nav.my_forecasts" %}</a>
+          {% if user.is_staff %}<a href="{% url 'admin:index' %}"><i data-lucide="settings"></i>{% t "nav.admin_panel" %}</a>{% endif %}
           <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}
-            <button type="submit"><i data-lucide="log-out"></i>Chiqish</button>
+            <button type="submit"><i data-lucide="log-out"></i>{% t "nav.logout" %}</button>
           </form>
         </div>
       </div>
     {% else %}
-      <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-sm">Kirish</a>
-      <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Boshlash</a>
+      <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-sm">{% t "nav.login" %}</a>
+      <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">{% t "nav.start" %}</a>
     {% endif %}
-    <button class="icon-btn menu-toggle" data-menu-toggle type="button" aria-label="Menyu"><i data-lucide="menu"></i></button>
+    <button class="icon-btn menu-toggle" data-menu-toggle type="button" aria-label="{% t 'nav.menu' %}"><i data-lucide="menu"></i></button>
   </div>
 </header>
 {% endwith %}
