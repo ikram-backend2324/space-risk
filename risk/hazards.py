@@ -2,10 +2,11 @@
 
 # code -> lucide icon, colour, annual trend (index points / year under climate change),
 #         satellite sources used to observe it. Labels/descriptions: locale_content.HAZARD_TEXT
+# Each hazard has its own colour (icon, bar, score, charts, 3D). Risk LEVEL colours are separate (LEVELS).
 HAZARDS = {
     "seismic": {
         "icon": "activity",
-        "color": "#f43f5e",
+        "color": "#ec4899",
         "trend": 0.0,
         "sources": ["Sentinel-1 InSAR", "GNSS tarmogʻi"],
     },
@@ -17,7 +18,7 @@ HAZARDS = {
     },
     "drought": {
         "icon": "sun",
-        "color": "#f59e0b",
+        "color": "#facc15",
         "trend": 0.9,
         "sources": ["MODIS NDVI", "SMAP tuproq namligi"],
     },
@@ -29,13 +30,13 @@ HAZARDS = {
     },
     "landslide": {
         "icon": "mountain",
-        "color": "#a16207",
+        "color": "#a8a29e",
         "trend": 0.3,
         "sources": ["Sentinel-1 InSAR", "SRTM DEM"],
     },
     "dust": {
         "icon": "wind",
-        "color": "#d97706",
+        "color": "#f97316",
         "trend": 0.7,
         "sources": ["Sentinel-5P", "MODIS AOD"],
     },
@@ -53,7 +54,7 @@ HAZARDS = {
     },
     "desertification": {
         "icon": "tent-tree",
-        "color": "#ca8a04",
+        "color": "#84cc16",
         "trend": 0.8,
         "sources": ["Landsat arxivi", "Sentinel-2 NDVI"],
     },

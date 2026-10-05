@@ -368,7 +368,10 @@ select.input option { background: var(--surface-solid); color: var(--text); }
 .hz-row:last-child { border: 0; }
 .hz-row .ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: var(--c); background: color-mix(in srgb, var(--c) 15%, transparent); }
 .hz-row .ic svg { width: 19px; height: 19px; }
-.hz-row .sc { text-align: right; font-family: "Space Grotesk"; font-weight: 700; font-size: 1.25rem; }
+.hz-row .sc { text-align: right; font-family: "Space Grotesk"; font-weight: 700; font-size: 1.25rem; color: var(--c); }
+.hz-head { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+.hz-name { flex: 1 1 0; min-width: 0; font-size: .93rem; line-height: 1.25; }
+.hz-badge { flex: 0 0 auto; margin-left: auto; min-width: 92px; justify-content: center; text-align: center; white-space: nowrap; }
 .rec { display: flex; gap: 14px; padding: 16px; border-radius: 16px; background: var(--surface-2); border: 1px solid var(--border); transition: transform .2s; }
 .rec:hover { transform: translateX(4px); }
 .rec .pr { width: 6px; border-radius: 6px; flex: none; background: var(--c); box-shadow: 0 0 14px var(--c); }

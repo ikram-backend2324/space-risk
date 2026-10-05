@@ -12,5 +12,6 @@ urlpatterns = [
     path("favicon.ico", lambda request: RedirectView.as_view(url=static("img/icons/favicon.ico"))(request)),
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
+    path("api/v1/", include("api.urls")),
     path("", include("risk.urls")),
 ]

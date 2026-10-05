@@ -59,7 +59,8 @@ def localized_text(pred, lang, allow_ai=True):
         return original
     fallback = {**engine.narrative(pred.region, pred.scores, pred.overall_score, pred.horizon_years,
                                    pred.created_at.year, lang), "translated": False}
-    if pred.source == "engine":
+    if pred.source == "engine" or lang == "kaa":
+        # Karakalpak always uses the hand-checked catalog (no machine translation).
         return fallback
     cached = (pred.translations or {}).get(lang)
     if cached:
@@ -179,6 +180,7 @@ def detail(request, pk):
             "labels": [r["label"] for r in rows],
             "now": [pred.region.baseline.get(r["code"], 0) for r in rows],
             "future": [r["score"] for r in rows],
+            "colors": [r["color"] for r in rows],
             "today": t("detail.chart_today"),
             "forecast": t("detail.chart_forecast"),
         },
@@ -196,7 +198,7 @@ def detail(request, pk):
         "color": pred.color,
     }
     return render(request, "risk/detail.html", {
-        "p": pred, "rows": rows, "chart": chart, "chat": pred.messages.all(), "text": text,
+        "p": pred, "rows": rows, "chart": chart, "chat": pred.messages.filter(language=lang), "text": text,
         "sources": [source_label(s, lang) for s in pred.satellite_sources],
         "horizon_text": i18n.years(pred.horizon_years),
     })
@@ -237,10 +239,11 @@ def ask(request, pk):
     question = question[:800]
     if _throttled(request, "ask", 4):
         return JsonResponse({"error": t("msg.slow_down")}, status=429)
-    history_msgs = list(pred.messages.all())
-    answer = ai.ask(pred, question, history_msgs, lang=request.LANG)
-    ChatMessage.objects.create(prediction=pred, role="user", content=question)
-    ChatMessage.objects.create(prediction=pred, role="assistant", content=answer)
+    lang = request.LANG
+    history_msgs = list(pred.messages.filter(language=lang))
+    answer = ai.ask(pred, question, history_msgs, lang=lang)
+    ChatMessage.objects.create(prediction=pred, role="user", content=question, language=lang)
+    ChatMessage.objects.create(prediction=pred, role="assistant", content=answer, language=lang)
     return JsonResponse({"answer": answer})
 
 

@@ -1,0 +1,310 @@
+﻿SPACE RISK — SAVOL VA JAVOBLAR / QUESTIONS AND ANSWERS
+Hududning kelajakdagi xavfini oldindan aytuvchi AI
+Taqdimot uchun tayyorgarlik (UzCosmos) / Presentation prep (UzCosmos)
+======================================================================
+
+MUHIM ESLATMA (taqdimotdan oldin oʻqing)
+----------------------------------------
+Hozirgi versiya — PROTOTIP (MVP). Sayt hozircha sunʼiy yoʻldoshlardan
+maʼlumotni avtomatik yuklab olmaydi. Hududlarning bazaviy xavf indekslari
+(0–100) ochiq ilmiy maʼlumotlar va maʼlum faktlar (seysmik zonalar, Orol
+inqirozi, iqlim) asosida qoʻlda baholangan. Hakamlar kosmik soha
+mutaxassislari — shuning uchun rostini aytish eng kuchli pozitsiya:
+"Platforma tayyor, real sunʼiy yoʻldosh maʼlumotlarini ulash — keyingi bosqich."
+
+IMPORTANT NOTE (read before the presentation)
+---------------------------------------------
+The current version is a PROTOTYPE (MVP). The website does NOT yet download
+satellite data automatically. The baseline risk indices (0–100) for each
+region were estimated by hand from open scientific knowledge and known facts
+(seismic zones, the Aral Sea crisis, climate). The jury are space experts —
+being honest is the strongest position: "The platform is ready; connecting
+real satellite data is the next stage."
+
+
+======================================================================
+1-SAVOL: Maʼlumotlar qaysi sunʼiy yoʻldoshdan olinadi? Ishonchlimi?
+         Feyk emasmi?
+======================================================================
+
+JAVOB (oʻzbekcha):
+Platforma quyidagi ochiq va bepul sunʼiy yoʻldosh missiyalariga
+moʻljallangan:
+  - Sentinel-1 (ESA, radar/InSAR) — yer yuzasi siljishi, zilzila va koʻchki
+    oldidan deformatsiya, toshqin maydonlari;
+  - Sentinel-2 (ESA) — oʻsimliklar (NDVI), yer usti suvlari, yer qoplami;
+  - Sentinel-5P (ESA) — havo ifloslanishi (NO₂, SO₂), chang va aerozollar;
+  - Landsat-9 (NASA/USGS) — yer yuzasi harorati, 40+ yillik arxiv;
+  - MODIS (NASA, Terra/Aqua) — harorat, NDVI, chang (AOD);
+  - GRACE-FO (NASA/GFZ) — yer osti suvlari zaxirasi oʻzgarishi;
+  - GPM (NASA/JAXA) — yogʻingarchilik;
+  - SMAP (NASA) — tuproq namligi.
+
+Bu missiyalarning maʼlumotlari xalqaro miqyosda ishonchli: ular ESA
+(Yevropa kosmik agentligi) va NASA tomonidan kalibrlanadi, ilmiy maqolalarda,
+BMT va Jahon banki hisobotlarida ishlatiladi. Shuning uchun MANBALAR feyk emas.
+
+Lekin rostini aytish kerak: hozirgi prototipda sayt bu maʼlumotlarni hali
+avtomatik yuklab olmaydi. Hududlarning boshlangʻich (bazaviy) xavf
+indekslari maʼlum ilmiy faktlar asosida baholangan, masalan:
+  - Fargʻona vodiysi va Toshkent — kuchli seysmik zona (1966-yil Toshkent
+    zilzilasi);
+  - Qoraqalpogʻiston — Orol fojiasi: tuzli chang boʻronlari, suv tanqisligi;
+  - Surxondaryo — mamlakatning eng issiq hududi;
+  - Buxoro — Gazli zilzilalari (1976, 1984).
+Prognoz esa shu indekslar, iqlim trendlari va sunʼiy intellekt (katta til
+modeli) yordamida tuziladi. Yaʼni hozir bu — ilmiy asoslangan baho, lekin
+toʻgʻridan-toʻgʻri sunʼiy yoʻldosh oʻlchovi emas.
+
+Ishonchlilikni oshirish rejasi (keyingi bosqich):
+  1. Copernicus Data Space Ecosystem (Sentinel), NASA Earthdata (MODIS,
+     GRACE-FO, GPM, SMAP), USGS (Landsat) va Google Earth Engine API'lari
+     orqali har bir hudud uchun indekslarni avtomatik hisoblash;
+  2. USGS/EMSC zilzila kataloglari va Oʻzgidromet, Favqulodda vaziyatlar
+     vazirligi maʼlumotlari bilan solishtirish;
+  3. UzCosmos bilan hamkorlikda milliy maʼlumotlardan foydalanish;
+  4. Oʻtmishdagi hodisalarda tekshirish (masalan, 2020-yil Sardoba suv
+     ombori) — model shu hodisalarni "oldindan koʻra olganmi?".
+
+Qisqa javob (taqdimot uchun):
+"Biz ESA va NASA'ning ochiq, ilmiy tan olingan missiyalariga tayanamiz —
+Sentinel, Landsat, MODIS, GRACE-FO. Hozirgi prototipda bazaviy indekslar
+ochiq ilmiy maʼlumotlar asosida baholangan; keyingi bosqichda ularni
+Copernicus va NASA API'lari orqali avtomatik hisoblaymiz."
+
+ANSWER (English):
+The platform is designed around open, free satellite missions: Sentinel-1
+(radar/InSAR: ground deformation, floods), Sentinel-2 (vegetation, surface
+water, land cover), Sentinel-5P (NO₂, SO₂, dust), Landsat-9 (land surface
+temperature, 40+ year archive), MODIS (temperature, NDVI, aerosols),
+GRACE-FO (groundwater), GPM (precipitation) and SMAP (soil moisture). These
+sources are internationally trusted — calibrated by ESA and NASA and used in
+scientific papers and UN / World Bank reports — so the SOURCES are not fake.
+
+To be honest, though: the current prototype does not yet download this data
+automatically. The baseline risk indices were estimated from established
+scientific facts (Fergana Valley and Tashkent seismic zones, the Aral Sea
+disaster, Surkhandarya heat, the Gazli earthquakes). Forecasts are then built
+from these indices, climate trends and AI. So today it is a science-based
+estimate, not a direct satellite measurement.
+
+Next step: compute the indices automatically via Copernicus Data Space,
+NASA Earthdata, USGS and Google Earth Engine; validate against earthquake
+catalogues (USGS/EMSC), Uzhydromet and Ministry of Emergency Situations
+data; partner with UzCosmos for national data; back-test on past events
+(e.g. the 2020 Sardoba dam failure).
+
+
+======================================================================
+2-SAVOL: Kelajakda koʻrsatilayotgan eng katta muammoga yechim topib bera
+         oladimi? Qanday qilib amalga oshiradi?
+======================================================================
+
+JAVOB (oʻzbekcha):
+SPACE RISK muammoni jismonan "hal qilmaydi" — masalan, qurgʻoqchilikni
+toʻxtata olmaydi. Uning vazifasi — muammoni OLDINDAN koʻrsatish va eng
+toʻgʻri qarorni tanlashga yordam berish. Bu xavfni kamaytirishning eng arzon
+yoʻli: BMT maʼlumotlariga koʻra, tayyorgarlikka sarflangan har 1 dollar
+ofatdan keyingi xarajatlarning bir necha baravarini tejaydi.
+
+Qanday ishlaydi:
+  1. Eng katta xavfni aniqlaydi — har bir hudud uchun 9 ta xavf turini
+     0–100 ballda baholaydi va eng xavflilarini birinchi qoʻyadi.
+  2. Vaqt boʻyicha koʻrsatadi — xavf 1, 5, 10 yoki 25 yilda qanday
+     oʻzgarishini grafikda koʻrsatadi; bu byudjet va qurilishni
+     rejalashtirishga yordam beradi.
+  3. Aniq tavsiyalar beradi — har bir xavf uchun ustuvorligi koʻrsatilgan
+     choralar. Masalan:
+       - zilzila: maktab va shifoxonalarni seysmik audit qilish;
+       - sel: togʻ soylarida erta ogohlantirish datchiklari va SMS-xabar;
+       - qurgʻoqchilik: tomchilatib sugʻorish (30% gacha suv tejash);
+       - chang boʻronlari: Orol tubiga saksovul ekish;
+       - issiqlik: shaharda yashil zonalar va salqinlash markazlari.
+  4. Nimani kuzatish kerakligini aytadi — qaysi sunʼiy yoʻldosh
+     maʼlumotlarini monitoring qilish kerakligini koʻrsatadi.
+  5. AI tahlilchi — "Birinchi navbatda nima qilish kerak?", "Qaysi tumanlar
+     eng zaif?" kabi savollarga hudud kontekstida javob beradi.
+
+Cheklovlar (rostini aytish kerak):
+  - Bu — qaror qabul qilishga yordam beruvchi vosita, rasmiy prognoz emas;
+    yakuniy qarorni mutaxassislar va davlat organlari qabul qiladi.
+  - AI tavsiyalari umumiy; aniq loyiha uchun muhandislik hisob-kitobi kerak.
+  - Uzoq muddatli (25 yil) prognozlarning ishonchliligi pastroq — sayt buni
+    "Ishonchlilik" foizida koʻrsatadi.
+
+Qisqa javob (taqdimot uchun):
+"SPACE RISK ofatni toʻxtatmaydi, lekin uni oldindan koʻrsatadi va qaysi
+chorani birinchi koʻrish kerakligini aytadi. Hokimlik yoki FVV uchun bu —
+pulni eng xavfli joyga, eng toʻgʻri vaqtda sarflash degani."
+
+ANSWER (English):
+SPACE RISK does not physically "solve" a problem — it cannot stop a drought.
+Its job is to show the problem IN ADVANCE and help choose the right decision,
+which is the cheapest way to reduce disaster losses (the UN estimates every
+dollar spent on preparedness saves several dollars in recovery).
+
+How: (1) it ranks the 9 hazards for each region on a 0–100 scale and puts the
+biggest first; (2) it shows how the risk develops over 1, 5, 10 or 25 years,
+which helps plan budgets and construction; (3) it gives prioritised measures
+— seismic audits of schools and hospitals, mudflow early-warning sensors with
+SMS alerts, drip irrigation (up to 30% water saving), saxaul planting on the
+dry Aral seabed, green zones and cooling centres against heat; (4) it lists
+which satellite data to monitor; (5) the AI analyst answers follow-up
+questions such as "What should be done first?".
+
+Limits: it is a decision-support tool, not an official forecast — experts and
+authorities make the final decision; AI recommendations are general and real
+projects need engineering studies; 25-year forecasts are less certain, which
+the site shows as a "Confidence" percentage.
+
+
+======================================================================
+3-SAVOL: Is it connected to real-time satellites?
+         (Real vaqtdagi sunʼiy yoʻldoshlarga ulanganmi?)
+======================================================================
+
+ANSWER (English):
+No — not yet. The current version is not connected to live satellite feeds.
+It uses baseline indices estimated from open scientific data, plus climate
+trends and AI. The "scanning" animation shown while a forecast is being made
+is a visual effect; it does not download satellite images.
+
+Also worth knowing: no satellite system is truly "real-time" for this kind of
+analysis. Observation satellites pass over the same place every few days
+(Sentinel-2 about every 5 days, Sentinel-1 every 6–12 days, Landsat 8+9 every
+8 days; MODIS daily; GRACE-FO gives monthly data). Data becomes available
+hours to days later ("near-real-time"). For risk forecasts over 1–25 years,
+this is more than enough — what matters is long, reliable time series, not
+second-by-second updates.
+
+Plan to connect real data:
+  1. Copernicus Data Space Ecosystem / Sentinel Hub API — Sentinel-1, -2, -5P;
+  2. NASA Earthdata (AppEEARS, GES DISC) — MODIS, GRACE-FO, GPM, SMAP;
+  3. USGS Earth Explorer / Landsat API — Landsat-8/9;
+  4. Google Earth Engine — fast processing of all of the above;
+  5. A scheduled job (e.g. weekly) recalculates each region's indices and
+     the website shows "data updated on <date>".
+All of these sources are free for research and public use.
+
+JAVOB (oʻzbekcha):
+Yoʻq — hozircha ulanmagan. Joriy versiya jonli sunʼiy yoʻldosh oqimiga ulanmagan:
+u ochiq ilmiy maʼlumotlar asosida baholangan bazaviy indekslar, iqlim
+trendlari va sunʼiy intellektdan foydalanadi. Prognoz tayyorlanayotganda
+koʻrinadigan "skanerlash" animatsiyasi — vizual effekt, u sunʼiy yoʻldosh
+tasvirlarini yuklab olmaydi.
+
+Bilish foydali: bunday tahlil uchun hech bir sunʼiy yoʻldosh tizimi toʻliq
+"real vaqt"da ishlamaydi. Sunʼiy yoʻldoshlar bir joy ustidan har bir necha
+kunda oʻtadi (Sentinel-2 — taxminan 5 kunda, Sentinel-1 — 6–12 kunda,
+Landsat 8+9 — 8 kunda, MODIS — har kuni, GRACE-FO — oylik maʼlumot).
+1–25 yillik xavf prognozi uchun bu yetarli — muhimi uzoq va ishonchli
+maʼlumotlar qatori, soniyalik yangilanish emas.
+
+Real maʼlumotni ulash rejasi: Copernicus Data Space / Sentinel Hub API
+(Sentinel-1, -2, -5P), NASA Earthdata (MODIS, GRACE-FO, GPM, SMAP), USGS
+(Landsat), Google Earth Engine; haftasiga bir marta hududlar indekslarini
+avtomatik qayta hisoblash va saytda "maʼlumot yangilangan sana"ni koʻrsatish.
+Bu manbalarning barchasi tadqiqot va jamoat foydasi uchun bepul.
+
+
+======================================================================
+4-SAVOL: If someone asks about our project: what is it for?
+         (Loyiha nima uchun kerak?)
+======================================================================
+
+ANSWER (English) — 30-second pitch:
+"SPACE RISK is an AI platform that predicts future natural and environmental
+risks for every region of Uzbekistan — earthquakes, mudflows, drought,
+heatwaves, landslides, dust and salt storms, water scarcity, air pollution
+and desertification — from 1 to 25 years ahead.
+
+Uzbekistan faces real, growing threats: the Fergana Valley and Tashkent lie
+in a strong seismic zone, the Aral Sea disaster sends salty dust over
+Karakalpakstan and Khorezm, water is becoming scarcer, and summers are
+getting hotter. Today this information is scattered across scientists,
+agencies and satellite archives.
+
+SPACE RISK brings it together in one simple website: choose a region and a
+time horizon, and in under a minute you get a clear risk score, charts, a 3D
+visualisation, prioritised recommendations and an AI analyst you can ask
+questions — in Uzbek, Karakalpak, Russian or English.
+
+It is built for UzCosmos, the Ministry of Emergency Situations, regional
+administrations (hokimiyats), urban planners, farmers, researchers and
+citizens — to spend money and effort where the risk is highest, before a
+disaster happens, not after."
+
+Who uses it and why:
+  - Government / emergency services — plan preparedness and investment;
+  - Hokimiyats and urban planners — where to build, what to reinforce;
+  - Farmers and water managers — drought and water-scarcity planning;
+  - Scientists and students — research and education;
+  - Citizens — understand the risks where they live.
+
+What makes it different:
+  - A space-data approach adapted to Uzbekistan's 14 regions;
+  - Long-term (up to 25 years) forecasts, not just today's weather;
+  - Concrete, prioritised recommendations, not only maps;
+  - Works on any phone or computer, in 4 languages including Karakalpak.
+
+JAVOB (oʻzbekcha) — 30 soniyalik taqdimot:
+"SPACE RISK — Oʻzbekistonning har bir hududi uchun kelajakdagi tabiiy va
+ekologik xavflarni — zilzila, sel, qurgʻoqchilik, issiqlik toʻlqini, koʻchki,
+chang-tuz boʻronlari, suv tanqisligi, havo ifloslanishi va choʻllanishni —
+1 yildan 25 yilgacha oldindan aytib beruvchi AI platforma.
+
+Oʻzbekiston real va kuchayib borayotgan xavflarga duch kelmoqda: Fargʻona
+vodiysi va Toshkent kuchli seysmik zonada, Orol fojiasi Qoraqalpogʻiston va
+Xorazmga tuzli chang olib kelmoqda, suv kamaymoqda, yoz esa issiqlashmoqda.
+Bugun bu maʼlumotlar olimlar, idoralar va sunʼiy yoʻldosh arxivlari orasida
+tarqoq.
+
+SPACE RISK ularni bitta oddiy saytga jamlaydi: hududni va muddatni tanlang —
+bir daqiqadan kamroq vaqtda aniq xavf bahosi, grafiklar, 3D vizualizatsiya,
+ustuvor tavsiyalar va savol berish mumkin boʻlgan AI tahlilchini olasiz —
+oʻzbek, qoraqalpoq, rus yoki ingliz tilida.
+
+Platforma UzCosmos, Favqulodda vaziyatlar vazirligi, hokimliklar,
+shaharsozlar, fermerlar, olimlar va fuqarolar uchun — pul va kuchni ofatdan
+KEYIN emas, OLDIN, eng xavfli joyga sarflash uchun yaratilgan."
+
+Kimlar foydalanadi:
+  - Davlat organlari va FVV — tayyorgarlik va investitsiyalarni rejalashtirish;
+  - Hokimliklar va shaharsozlar — qayerda qurish, nimani mustahkamlash;
+  - Fermerlar va suv xoʻjaligi — qurgʻoqchilik va suv tanqisligiga tayyorgarlik;
+  - Olimlar va talabalar — tadqiqot va taʼlim;
+  - Fuqarolar — oʻz hududidagi xavflarni bilish.
+
+Afzalliklari:
+  - Oʻzbekistonning 14 hududiga moslashtirilgan kosmik yondashuv;
+  - Uzoq muddatli (25 yilgacha) prognoz, faqat bugungi ob-havo emas;
+  - Faqat xarita emas — aniq, ustuvorligi koʻrsatilgan tavsiyalar;
+  - Har qanday telefon va kompyuterda, 4 tilda (qoraqalpoq tili ham).
+
+
+======================================================================
+QOʻSHIMCHA: hakamlar soʻrashi mumkin boʻlgan savollar
+EXTRA: other questions the jury may ask
+======================================================================
+
+S: AI qanday model? / Which AI model?
+J: OpenRouter orqali ulanadigan katta til modeli (hozir standart:
+   openai/gpt-4o-mini; sozlamalarda almashtirish mumkin). AI ishlamasa,
+   ichki SPACE RISK modeli iqlim trendlari asosida prognoz beradi.
+A: A large language model via OpenRouter (default: openai/gpt-4o-mini,
+   configurable). If AI is unavailable, the built-in SPACE RISK model
+   calculates the forecast from climate trends.
+
+S: Prognoz aniqligi qancha? / How accurate is it?
+J: Aniqlik hali oʻtmishdagi hodisalarda tekshirilmagan — bu keyingi bosqich
+   (backtesting). Har bir prognozda "Ishonchlilik" foizi koʻrsatiladi.
+A: Accuracy has not yet been validated on past events — that is the next
+   step (back-testing). Each forecast shows a "Confidence" percentage.
+
+S: Keyingi rejalar? / What's next?
+J: 1) real sunʼiy yoʻldosh maʼlumotlarini ulash; 2) tuman darajasiga
+   tushish; 3) oʻtmishdagi ofatlarda tekshirish; 4) FVV bilan erta
+   ogohlantirish integratsiyasi; 5) Telegram-bot.
+A: 1) connect real satellite data; 2) go down to district level;
+   3) back-test on past disasters; 4) early-warning integration with the
+   Ministry of Emergency Situations; 5) a Telegram bot.

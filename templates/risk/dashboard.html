@@ -1,6 +1,6 @@
 {% extends "base.html" %}{% load static %}
 {% block title %}{% t "nav.dashboard" %}{% endblock %}
-{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endblock %}
 
 {% block content %}
 <div class="page-head row-between reveal">
@@ -22,7 +22,7 @@
   <div class="card reveal">
     <div class="row-between" style="margin-bottom:14px">
       <div class="card-title" style="margin:0"><i data-lucide="map"></i>{% t "dash.map_title" %}</div>
-      <span class="chip chip-live">{% t "dash.map_chip" %}</span>
+      <span class="chip"><i data-lucide="layers"></i>{% t "dash.map_chip" %}</span>
     </div>
     <div id="risk-map" class="map" style="height:560px"></div>
     <div class="map-legend">
@@ -94,8 +94,8 @@
 {{ regions_json|json_script:"regions-data" }}
 {{ national_json|json_script:"national-data" }}
 {{ levels_json|json_script:"levels-data" }}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'vendor/chart.umd.min.js' %}"></script>
 <script src="{% static 'js/map.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
 <script>

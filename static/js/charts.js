@@ -24,7 +24,7 @@
       if (s.grid) s.grid.color = grid;
       if (s.angleLines) s.angleLines.color = grid;
       if (s.ticks) s.ticks.color = muted;
-      if (s.pointLabels) s.pointLabels.color = css("--text");
+      if (s.pointLabels && typeof s.pointLabels.color !== "function") s.pointLabels.color = css("--text");
     });
     if (chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = muted;
     chart.update("none");

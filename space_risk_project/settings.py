@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "accounts",
     "risk",
+    "api",
 ]
 
 MIDDLEWARE = [
@@ -125,6 +126,8 @@ if not DEBUG:
 # ---------------------------------------------------------------- OpenRouter
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+# Optional stronger model for Karakalpak chat answers (small models mix it with Uzbek/Kazakh).
+OPENROUTER_MODEL_KAA = os.getenv("OPENROUTER_MODEL_KAA", "")
 OPENROUTER_TIMEOUT = int(os.getenv("OPENROUTER_TIMEOUT", "60"))
 SITE_URL = os.getenv("SITE_URL", f"https://{RENDER_EXTERNAL_HOSTNAME}" if RENDER_EXTERNAL_HOSTNAME else "http://localhost:8000")
 

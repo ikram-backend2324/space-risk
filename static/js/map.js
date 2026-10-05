@@ -2,7 +2,9 @@
 window.createRiskMap = function (el, regions, opts = {}) {
   const T = window.T || ((k) => k);
   const esc = window.escapeHtml || ((s) => s);
-  const map = L.map(el, { zoomControl: true, scrollWheelZoom: false, attributionControl: true }).setView([41.2, 64.2], 6);
+  const map = L.map(el, { zoomControl: false, scrollWheelZoom: false, attributionControl: true }).setView([41.2, 64.2], 6);
+  L.control.zoom({ zoomInTitle: T("zoom_in"), zoomOutTitle: T("zoom_out") }).addTo(map);
+  map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
   const esri = (path) => `https://server.arcgisonline.com/ArcGIS/rest/services/${path}/MapServer/tile/{z}/{y}/{x}`;
   const attribution = "Tiles &copy; Esri — Maxar, Earthstar Geographics";
   const satellite = L.layerGroup([

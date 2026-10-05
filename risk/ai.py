@@ -22,6 +22,27 @@ Be realistic and specific to the region's geography (mountains, Fergana Valley, 
 Aral Sea basin, Amu Darya / Syr Darya, etc.)."""
 
 
+KAA_GUIDE = """
+KARAKALPAK STYLE GUIDE (follow strictly):
+- Alphabet: a á b d e f g ǵ h x ı i j k q l m n ń o ó p r s t u ú v w y z sh c ch. Capital of ı is Í.
+- NEVER use Uzbek spellings: no oʻ / gʻ / apostrophes, no "va", "uchun", "xavf", "hudud", "prognoz", "boʻyicha", "kerak boʻladi".
+- Use: hám (and), ushın (for), qáwip (risk), aymaq (region), wálayat (province), boljaw (forecast),
+  boyınsha (by), usınıs (recommendation), ilaj (measure), jer silkiniw (earthquake), sel hám tasqın (floods),
+  qurǵaqshılıq (drought), ıssılıq tolqını (heatwave), suw tanqıslıǵı (water scarcity), shań-duz boranları
+  (dust-salt storms), hawanıń pataslanıwı (air pollution), shólge aylanıw (desertification),
+  jasalma joldas (satellite), jasalma intellekt (AI), scenariy (scenario), kerek (needed).
+- Example sentence: "Aral teńizi aymaǵında shań-duz boranları qáwipi joqarı, sonlıqtan seksewil egiw usınıladı."
+"""
+KAA_RETRY = ("Rewrite your previous answer in correct Karakalpak (Latin alphabet with á, ǵ, ı, ń, ó, ú, w). "
+             "Remove every Uzbek word and every apostrophe letter (oʻ, gʻ). Keep the same meaning and length.")
+_UZ_MARKERS = re.compile(r"[ʻʼ‘’']|(?<!\w)(va|uchun|xavf|hudud|prognoz|boʻyicha|kerak boʻladi|qilish|boʻlgan)(?!\w)", re.I)
+
+
+def looks_uzbek(text):
+    """Heuristic: Karakalpak text should not contain Uzbek-only spellings/words."""
+    return len(_UZ_MARKERS.findall(text or "")) >= 2
+
+
 def _language_rule(lang):
     return (f"\nLANGUAGE: write EVERY human-readable text strictly in {i18n.AI_LANGUAGE[lang]}. "
             "Do not mix languages. Keep satellite/mission names (Sentinel, Landsat, MODIS…) as they are.")
@@ -36,9 +57,9 @@ def _headers():
     }
 
 
-def _chat(messages, *, json_mode=False, max_tokens=1800, temperature=0.4):
+def _chat(messages, *, json_mode=False, max_tokens=1800, temperature=0.4, model=None):
     payload = {
-        "model": settings.OPENROUTER_MODEL,
+        "model": model or settings.OPENROUTER_MODEL,
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
@@ -151,11 +172,20 @@ Return ONLY a JSON object with exactly these keys (JSON keys stay in English):
     if result["timeline"]:
         # Keep the chart's last point consistent with the headline number.
         result["timeline"][-1]["overall"] = result["overall_score"]
+    if lang == "kaa":
+        # Language models write Karakalpak unreliably (mixing in Uzbek/Kazakh). Keep the AI's numbers,
+        # but take the summary, drivers and recommendations from the hand-checked Karakalpak catalog.
+        result.update(engine.narrative(region, scores, result["overall_score"], horizon, lang="kaa"))
     return result, "ai", model
 
 
 def translate(prediction, lang):
-    """Translate an AI forecast's text into ``lang``. Returns dict or raises."""
+    """Translate an AI forecast's text into ``lang``. Returns dict or raises.
+
+    Not used for Karakalpak — callers use the hand-checked catalog text instead.
+    """
+    if lang == "kaa":
+        raise ValueError("Karakalpak uses catalog text, not machine translation")
     payload = {
         "summary": prediction.summary,
         "drivers": prediction.drivers,
@@ -205,8 +235,15 @@ def ask(prediction, question, history, lang=None):
     for m in history[-8:]:
         messages.append({"role": m.role, "content": m.content})
     messages.append({"role": "user", "content": question})
+    model = (settings.OPENROUTER_MODEL_KAA or None) if lang == "kaa" else None
+    if lang == "kaa":
+        messages[0]["content"] += KAA_GUIDE
     try:
-        text, _ = _chat(messages, max_tokens=700, temperature=0.5)
+        text, _ = _chat(messages, max_tokens=700, temperature=0.4, model=model)
+        if lang == "kaa" and looks_uzbek(text):
+            messages.append({"role": "assistant", "content": text})
+            messages.append({"role": "user", "content": KAA_RETRY})
+            text, _ = _chat(messages, max_tokens=700, temperature=0.2, model=model)
         return text.strip() or i18n.t("ai.empty", lang)
     except Exception as exc:
         log.warning("OpenRouter chat failed: %s", exc)

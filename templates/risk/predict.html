@@ -1,6 +1,6 @@
 {% extends "base.html" %}{% load static %}
 {% block title %}{% t "nav.new" %}{% endblock %}
-{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endblock %}
 
 {% block content %}
 <div class="page-head reveal">
@@ -75,7 +75,7 @@
 
 {% block scripts %}
 {{ regions_json|json_script:"regions-data" }}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
 <script src="{% static 'js/map.js' %}"></script>
 <script>
   const regions = JSON.parse(document.getElementById("regions-data").textContent);

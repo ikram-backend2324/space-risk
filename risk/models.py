@@ -135,6 +135,8 @@ class ChatMessage(models.Model):
     prediction = models.ForeignKey(Prediction, on_delete=models.CASCADE, related_name="messages")
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     content = models.TextField()
+    # Each UI language keeps its own conversation thread with the AI analyst.
+    language = models.CharField(max_length=5, default="uz", db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

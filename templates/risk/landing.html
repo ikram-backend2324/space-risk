@@ -35,7 +35,7 @@
   <div class="card card-glow hero-hud reveal d4">
     <div class="row-between" style="margin-bottom:8px">
       <b class="display" style="font-size:.95rem">{% t "landing.hud_title" %}</b>
-      <span class="chip chip-live">LIVE</span>
+      <span class="chip">{% t "landing.hud_chip" %}</span>
     </div>
     {% for r in top_regions %}
       <div class="hud-line"><span>{{ r.display_name }}</span><span class="badge" style="--c:{{ r.color }}">{{ r.composite }}</span></div>

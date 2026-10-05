@@ -56,7 +56,7 @@
       <div class="hz-row" style="--c:{{ r.color }}">
         <div class="ic"><i data-lucide="{{ r.icon }}"></i></div>
         <div>
-          <div class="row-between"><b style="font-size:.93rem">{{ r.label }}</b><span class="badge" style="--c:{{ r.level_color }}">{{ r.level_label }}</span></div>
+          <div class="hz-head"><b class="hz-name">{{ r.label }}</b><span class="badge hz-badge" style="--c:{{ r.level_color }}">{{ r.level_label }}</span></div>
           <div class="bar"><span data-width="{{ r.score }}" style="background:linear-gradient(90deg, {{ r.color }}88, {{ r.color }})"></span></div>
         </div>
         <div class="sc" style="color:{{ r.color }}">{{ r.score }}</div>
@@ -132,7 +132,7 @@
 
 {% block scripts %}
 {{ chart|json_script:"chart-data" }}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'vendor/chart.umd.min.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
 <script type="module">
   import { createRiskTowers } from "{% static 'js/risk3d.js' %}";
@@ -170,13 +170,13 @@
     data: {
       labels: d.radar.labels,
       datasets: [
-        { label: d.radar.today, data: d.radar.now, borderColor: "#8b5cf6", backgroundColor: "rgba(139,92,246,.18)", borderWidth: 2, pointRadius: 3 },
-        { label: d.radar.forecast, data: d.radar.future, borderColor: d.color, backgroundColor: d.color + "33", borderWidth: 2.5, pointRadius: 4 },
+        { label: d.radar.today, data: d.radar.now, borderColor: "#94a3b8", backgroundColor: "rgba(148,163,184,.14)", borderWidth: 2, borderDash: [5, 4], pointRadius: 3, pointBackgroundColor: d.radar.colors },
+        { label: d.radar.forecast, data: d.radar.future, borderColor: d.color, backgroundColor: d.color + "26", borderWidth: 2.5, pointRadius: 5, pointHoverRadius: 7, pointBackgroundColor: d.radar.colors, pointBorderColor: d.radar.colors },
       ],
     },
     options: {
       maintainAspectRatio: false,
-      scales: { r: { suggestedMin: 0, suggestedMax: 100, ticks: { display: false, stepSize: 20 }, grid: {}, angleLines: {}, pointLabels: { font: { size: 11, weight: 600 } } } },
+      scales: { r: { suggestedMin: 0, suggestedMax: 100, ticks: { display: false, stepSize: 20 }, grid: {}, angleLines: {}, pointLabels: { font: { size: 11, weight: 700 }, color: (ctx) => d.radar.colors[ctx.index] } } },
       plugins: { legend: { position: "bottom" } },
     },
   });
