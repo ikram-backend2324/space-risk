@@ -5,7 +5,7 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py seed && python manage.py collectstatic --noinput
-    startCommand: gunicorn courier_project.wsgi:application
+    startCommand: gunicorn space_risk_project.wsgi:application
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9

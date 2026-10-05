@@ -1,9 +1,4 @@
-"""
-SPACE RISK — Django settings.
-
-The package keeps the name ``courier_project`` so the Render start command
-``gunicorn courier_project.wsgi:application`` works as-is.
-"""
+"""SPACE RISK — Django settings."""
 import os
 from pathlib import Path
 
@@ -54,7 +49,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "courier_project.urls"
+ROOT_URLCONF = "space_risk_project.urls"
 
 TEMPLATES = [
     {
@@ -73,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "courier_project.wsgi.application"
+WSGI_APPLICATION = "space_risk_project.wsgi.application"
 
 # Database: PostgreSQL / MySQL via DATABASE_URL, SQLite fallback for local dev.
 #   postgres://user:pass@host:5432/dbname

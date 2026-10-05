@@ -32,7 +32,7 @@ Open http://127.0.0.1:8000 · Admin: http://127.0.0.1:8000/admin/
 2. Create a **PostgreSQL** database on Render (free) and copy its *Internal Database URL*.
 3. Create a **Web Service** from the repo:
    - **Build Command:** `pip install -r requirements.txt && python manage.py migrate && python manage.py seed && python manage.py collectstatic --noinput`
-   - **Start Command:** `gunicorn courier_project.wsgi:application`
+   - **Start Command:** `gunicorn space_risk_project.wsgi:application`
 4. Environment variables:
 
 | Key | Value |
@@ -47,8 +47,6 @@ Open http://127.0.0.1:8000 · Admin: http://127.0.0.1:8000/admin/
 
 Or use the included `render.yaml` blueprint, which creates the web service and the database together.
 
-> The Django settings package is called `courier_project` so the start command above works unchanged.
-
 ## Logo / brand assets
 All in `branding/`:
 - `logo-mark.svg`: icon (vector, master file)
@@ -60,7 +58,7 @@ The website uses copies in `static/img/`.
 
 ## Project layout
 ```
-courier_project/   settings, urls, wsgi
+space_risk_project/   settings, urls, wsgi
 accounts/          register, login, profile
 risk/              models, views, OpenRouter client (ai.py), fallback engine (engine.py), hazard + region data, seed command
 templates/         Django templates
