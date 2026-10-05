@@ -22,6 +22,9 @@ AI platform for UzCosmos. It forecasts natural and environmental hazard risk for
 - `/api/regions/?lang=kaa` returns region data in any of the 4 languages.
 - Django's own admin has no Karakalpak translation, so the admin panel shows Uzbek when Karakalpak is selected.
 
+## User guide
+`docs/SPACE_RISK_Qollanma.docx` (and `.pdf`): a 35-page illustrated guide for new users in Uzbek, English, Russian and Karakalpak: what the platform is, sign-up, making and reading forecasts, the AI chat, phone use, FAQ and an administrator section.
+
 ## Run locally
 ```bash
 python -m venv .venv
