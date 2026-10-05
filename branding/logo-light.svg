@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 128" width="1200" height="256" role="img" aria-label="SPACE RISK — Hududning kelajakdagi xavfini oldindan aytuvchi AI">
+  <title>SPACE RISK</title>
+  <defs>
+    <linearGradient id="w-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="0.55" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#c026d3"/>
+    </linearGradient>
+  </defs>
+  <g>
+  
+  <defs>
+    <linearGradient id="sr-orbit" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="0.55" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#c026d3"/>
+    </linearGradient>
+    <radialGradient id="sr-planet" cx="0.36" cy="0.32" r="0.8">
+      <stop offset="0" stop-color="#67e8f9"/>
+      <stop offset="0.35" stop-color="#0ea5e9"/>
+      <stop offset="0.75" stop-color="#3730a3"/>
+      <stop offset="1" stop-color="#1e1b4b"/>
+    </radialGradient>
+    <radialGradient id="sr-halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.45" stop-color="#22d3ee" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sr-sweep" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbbf24" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#fbbf24" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="sr-planet-clip"><circle cx="64" cy="64" r="30"/></clipPath>
+    <clipPath id="sr-front" clipPathUnits="userSpaceOnUse"><rect x="0" y="64" width="128" height="64"/></clipPath>
+    <filter id="sr-glow" filterUnits="userSpaceOnUse" x="-40" y="-40" width="208" height="208">
+      <feGaussianBlur stdDeviation="2.4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- halo -->
+  <circle cx="64" cy="64" r="46" fill="url(#sr-halo)"/>
+
+  <!-- orbit, back half (behind planet) -->
+  <g transform="rotate(-24 64 64)">
+    <ellipse cx="64" cy="64" rx="56" ry="17" fill="none" stroke="url(#sr-orbit)" stroke-width="3.2" opacity="0.45"/>
+  </g>
+
+  <!-- planet -->
+  <circle cx="64" cy="64" r="30" fill="url(#sr-planet)"/>
+  <g clip-path="url(#sr-planet-clip)" fill="none" stroke="#e0f2fe" stroke-opacity="0.28" stroke-width="1">
+    <ellipse cx="64" cy="64" rx="30" ry="9"/>
+    <ellipse cx="64" cy="64" rx="30" ry="20"/>
+    <ellipse cx="64" cy="64" rx="10" ry="30"/>
+    <ellipse cx="64" cy="64" rx="21" ry="30"/>
+    <!-- risk radar sweep -->
+    <path d="M64 64 L64 30 A34 34 0 0 1 94 50 Z" fill="url(#sr-sweep)" stroke="none"/>
+    <circle cx="64" cy="64" r="12" stroke="#fbbf24" stroke-opacity="0.6" stroke-dasharray="3 3"/>
+  </g>
+  <!-- hotspot (risk zone) -->
+  <circle cx="74" cy="50" r="3.4" fill="#fbbf24" filter="url(#sr-glow)"/>
+  <circle cx="74" cy="50" r="7" fill="none" stroke="#fbbf24" stroke-opacity="0.55" stroke-width="1.2"/>
+
+  <!-- orbit, front half (over planet) -->
+  <g transform="rotate(-24 64 64)">
+    <ellipse cx="64" cy="64" rx="56" ry="17" fill="none" stroke="url(#sr-orbit)" stroke-width="3.6" clip-path="url(#sr-front)" filter="url(#sr-glow)"/>
+  </g>
+
+  <!-- satellite on orbit -->
+  <g transform="translate(107 54) rotate(-24)" filter="url(#sr-glow)">
+    <rect x="-9" y="-2.6" width="6" height="5.2" rx="1" fill="#22d3ee"/>
+    <rect x="3" y="-2.6" width="6" height="5.2" rx="1" fill="#22d3ee"/>
+    <rect x="-3" y="-3.6" width="6" height="7.2" rx="1.6" fill="#f8fafc"/>
+  </g>
+  <!-- signal waves from satellite toward the hotspot -->
+  <g fill="none" stroke="#f8fafc" stroke-linecap="round" stroke-width="1.6" opacity="0.8">
+    <path d="M98 45 a8 8 0 0 0 -6 -3"/>
+    <path d="M101 41 a14 14 0 0 0 -11 -5"/>
+  </g>
+</g>
+  <text x="140" y="74" font-family="'Space Grotesk','Segoe UI',Arial,sans-serif" font-size="54" font-weight="700" letter-spacing="3" fill="#0f172a">SPACE <tspan fill="url(#w-grad)">RISK</tspan></text>
+  <text x="142" y="102" font-family="'Inter','Segoe UI',Arial,sans-serif" font-size="14.5" letter-spacing="2" fill="#475569">HUDUDLAR XAVFINI OLDINDAN AYTUVCHI AI</text>
+</svg>

@@ -1,0 +1,8 @@
+{% load static %}
+<footer class="footer">
+  <div class="container row-between">
+    <a href="{% url 'risk:landing' %}" class="brand"><img src="{% static 'img/logo-mark.svg' %}" alt=""><span>SPACE <b>RISK</b></span></a>
+    <span>{{ SITE_TAGLINE }} · UzCosmos uchun ishlab chiqilgan</span>
+    <span class="chip {% if AI_ONLINE %}chip-live{% else %}chip-off{% endif %}">AI {% if AI_ONLINE %}onlayn{% else %}ichki model{% endif %}</span>
+  </div>
+</footer>

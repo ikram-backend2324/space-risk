@@ -1,0 +1,38 @@
+{% extends "base.html" %}{% load static %}
+{% block nav %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block main %}
+<div class="auth-wrap">
+  <aside class="auth-visual">
+    <div id="auth-planet"></div>
+    <a href="{% url 'risk:landing' %}" class="brand"><img src="{% static 'img/logo-mark.svg' %}" alt=""><span>SPACE <b>RISK</b></span></a>
+    <div class="auth-quote reveal">
+      {% block quote %}{% endblock %}
+      <div class="orbit-stats mt-3">
+        <div><b data-count="14">0</b><span>hudud</span></div>
+        <div><b data-count="9">0</b><span>xavf turi</span></div>
+        <div><b data-count="25">0</b><span>yillik prognoz</span></div>
+      </div>
+    </div>
+  </aside>
+  <section class="auth-panel">
+    <div class="auth-top">
+      <a href="{% url 'risk:landing' %}" class="icon-btn" title="Bosh sahifa" aria-label="Bosh sahifa"><i data-lucide="globe"></i></a>
+      <button class="icon-btn theme-toggle" data-theme-toggle type="button" aria-label="Rejimni almashtirish"><i data-lucide="moon" class="moon"></i><i data-lucide="sun" class="sun"></i></button>
+    </div>
+    <div class="card card-glow auth-card reveal d1">
+      {% block form %}{% endblock %}
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module">
+  import { createGlobe } from "{% static 'js/globe.js' %}";
+  createGlobe(document.getElementById("auth-planet"), {
+    textures: { day: "{% static 'img/textures/earth-day.jpg' %}", night: "{% static 'img/textures/earth-night.jpg' %}", water: "{% static 'img/textures/earth-water.png' %}" },
+    offsetX: 0, offsetY: 0.14, narrowOffsetY: 0.1, distance: 4.6, satellites: 2, interactive: false, autoRotate: 0.0018, stars: false,
+  });
+</script>
+{% endblock %}

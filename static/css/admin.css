@@ -1,0 +1,10 @@
+/* SPACE RISK branding for the Jazzmin admin */
+.brand-link .brand-image { opacity: 1 !important; box-shadow: none !important; background: transparent; }
+.login-logo img { max-width: 300px; }
+.login-page, .register-page {
+  background: radial-gradient(900px 600px at 80% -10%, rgba(99,102,241,.35), transparent 60%),
+              radial-gradient(800px 500px at -10% 110%, rgba(34,211,238,.22), transparent 60%), #050816 !important;
+}
+.login-box .card { border-radius: 18px; overflow: hidden; border: 1px solid rgba(148,163,255,.18); }
+.main-sidebar .brand-text { letter-spacing: .08em; font-weight: 700 !important; }
+.content-wrapper { background-image: radial-gradient(900px 600px at 100% 0, rgba(99,102,241,.08), transparent 60%); }

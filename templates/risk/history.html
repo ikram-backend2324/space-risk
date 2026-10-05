@@ -1,0 +1,44 @@
+{% extends "base.html" %}{% load humanize %}
+{% block title %}Prognozlar tarixi{% endblock %}
+{% block content %}
+<div class="page-head row-between reveal">
+  <div>
+    <h1>Prognozlar <span class="grad-text">tarixi</span></h1>
+    <p>Barcha AI prognozlaringiz bir joyda.</p>
+  </div>
+  <form method="get" class="row">
+    <select name="region" class="input" onchange="this.form.submit()" style="min-width:240px">
+      <option value="">Barcha hududlar</option>
+      {% for r in regions %}<option value="{{ r.slug }}" {% if r.slug == current_region %}selected{% endif %}>{{ r.name }}</option>{% endfor %}
+    </select>
+  </form>
+</div>
+
+{% if predictions %}
+<div class="grid grid-3">
+  {% for p in predictions %}
+  <a href="{{ p.get_absolute_url }}" class="card tilt reveal d{{ forloop.counter0|divisibleby:3|yesno:'1,2' }}" style="display:block">
+    <div class="row-between">
+      <span class="chip"><i data-lucide="calendar"></i>{{ p.horizon_years }} yil → {{ p.target_year }}</span>
+      <span class="muted small">{% if p.source == "ai" %}🤖 AI{% else %}⚙️{% endif %}</span>
+    </div>
+    <h3 class="mt-2" style="font-size:1.25rem">{{ p.region.name }}</h3>
+    <div class="row mt-2" style="align-items:flex-end">
+      <b class="display" style="font-size:2.6rem;color:{{ p.color }};line-height:1">{{ p.overall_score|floatformat:0 }}</b>
+      <span class="badge" style="--c:{{ p.color }};margin-bottom:6px">{{ p.get_level_display }}</span>
+    </div>
+    <div class="bar"><span style="width:{{ p.overall_score|floatformat:0 }}%;background:{{ p.color }}"></span></div>
+    <p class="muted small mt-2" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ p.summary }}</p>
+    <p class="muted small mt-1">{{ p.created_at|naturaltime }}</p>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty reveal">
+  <i data-lucide="satellite"></i>
+  <h3>Hali prognoz yoʻq</h3>
+  <p class="mt-1">Birinchi AI prognozingizni yarating.</p>
+  <a href="{% url 'risk:predict' %}" class="btn btn-primary mt-2"><i data-lucide="radar"></i>Prognoz yaratish</a>
+</div>
+{% endif %}
+{% endblock %}

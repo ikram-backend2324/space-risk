@@ -1,0 +1,221 @@
+{% extends "base.html" %}{% load static risk_tags humanize %}
+{% block title %}{{ p.region.name }} · prognoz{% endblock %}
+
+{% block content %}
+<div class="page-head row-between reveal">
+  <div>
+    <a href="{% url 'risk:history' %}" class="muted small">← Prognozlar tarixi</a>
+    <h1 class="mt-1">{{ p.region.name }}</h1>
+    <p>{{ p.horizon_years }} yillik prognoz · {{ p.created_at|date:"d.m.Y H:i" }} · {% if p.source == "ai" %}🤖 {{ p.model_name }}{% else %}⚙️ {{ p.model_name|default:"Ichki model" }}{% endif %}</p>
+  </div>
+  <div class="row">
+    <button class="btn" onclick="window.print()"><i data-lucide="download"></i>PDF / Chop etish</button>
+    <a href="{% url 'risk:predict' %}?region={{ p.region.slug }}" class="btn btn-primary"><i data-lucide="radar"></i>Qayta prognoz</a>
+  </div>
+</div>
+
+<div class="card card-glow reveal">
+  <div class="result-hero">
+    <div class="gauge" style="--c:{{ p.color }}">
+      <svg viewBox="0 0 260 260">
+        <circle class="track" cx="130" cy="130" r="110" fill="none" stroke-width="16" stroke-dasharray="518 691" stroke-linecap="round"/>
+        <circle class="val" id="gauge-val" cx="130" cy="130" r="110" fill="none" stroke="{{ p.color }}" stroke-width="16" stroke-dasharray="518 691" stroke-dashoffset="518"/>
+      </svg>
+      <div class="lbl">
+        <b data-count="{{ p.overall_score|floatformat:0 }}">0</b>
+        <span>/ 100 umumiy xavf</span>
+        <div class="mt-1"><span class="badge" style="--c:{{ p.color }}">{{ level_label }}</span></div>
+      </div>
+    </div>
+    <div>
+      <span class="chip"><i data-lucide="calendar"></i>{{ p.target_year }}-yilgacha prognoz</span>
+      <p class="summary mt-2">{{ p.summary }}</p>
+      <div class="meta-grid">
+        <div><span>Ishonchlilik</span><b>{{ p.confidence }}%</b></div>
+        <div><span>Muddat</span><b>{{ p.horizon_years }} yil</b></div>
+        <div><span>Aholi</span><b>{{ p.region.population|mln }} mln</b></div>
+        <div><span>Maydon</span><b>{{ p.region.area_km2|intcomma }} km²</b></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="split mt-3">
+  <div class="card reveal">
+    <div class="row-between" style="margin-bottom:14px">
+      <div class="card-title" style="margin:0"><i data-lucide="layers"></i>3D xavf konstellatsiyasi</div>
+      <span class="muted small">Sichqoncha bilan aylantiring</span>
+    </div>
+    <div id="bars3d"></div>
+  </div>
+  <div class="card reveal d1">
+    <div class="card-title"><i data-lucide="shield-alert"></i>Xavf turlari boʻyicha</div>
+    <div class="bars">
+      {% for r in rows %}
+      <div class="hz-row" style="--c:{{ r.color }}">
+        <div class="ic"><i data-lucide="{{ r.icon }}"></i></div>
+        <div>
+          <div class="row-between"><b style="font-size:.93rem">{{ r.label }}</b><span class="badge" style="--c:{{ r.level_color }}">{{ r.score|level_label }}</span></div>
+          <div class="bar"><span data-width="{{ r.score }}" style="background:linear-gradient(90deg, {{ r.color }}88, {{ r.color }})"></span></div>
+        </div>
+        <div class="sc" style="color:{{ r.color }}">{{ r.score }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-2 mt-3">
+  <div class="card reveal">
+    <div class="card-title"><i data-lucide="activity"></i>Vaqt boʻyicha dinamika</div>
+    <div class="chart-box"><canvas id="timeline-chart"></canvas></div>
+  </div>
+  <div class="card reveal d1">
+    <div class="card-title"><i data-lucide="radar"></i>Bugun va {{ p.target_year }}</div>
+    <div class="chart-box"><canvas id="radar-chart"></canvas></div>
+  </div>
+</div>
+
+<div class="split mt-3">
+  <div class="card reveal">
+    <div class="card-title"><i data-lucide="lightbulb"></i>Tavsiyalar</div>
+    <div class="stack">
+      {% for rec in p.recommendations %}
+      <div class="rec" style="--c:{% if rec.priority == 'high' %}#ef4444{% elif rec.priority == 'medium' %}#eab308{% else %}#22c55e{% endif %}">
+        <div class="pr"></div>
+        <div>
+          <div class="row" style="gap:8px;margin-bottom:4px"><h4 style="margin:0">{{ rec.title }}</h4>
+            <span class="badge" style="--c:{% if rec.priority == 'high' %}#ef4444{% elif rec.priority == 'medium' %}#eab308{% else %}#22c55e{% endif %}">{% if rec.priority == 'high' %}Yuqori{% elif rec.priority == 'medium' %}Oʻrta{% else %}Past{% endif %}</span></div>
+          <p>{{ rec.text }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="card reveal d1">
+    <div class="card-title"><i data-lucide="target"></i>Asosiy omillar</div>
+    {% for d in p.drivers %}<div class="driver"><i data-lucide="circle-alert"></i><span>{{ d }}</span></div>{% endfor %}
+    <div class="card-title mt-3"><i data-lucide="satellite"></i>Monitoring manbalari</div>
+    <div class="row" style="flex-wrap:wrap;gap:8px">{% for s in p.satellite_sources %}<span class="chip">{{ s }}</span>{% endfor %}</div>
+    {% if p.notes %}<div class="card-title mt-3"><i data-lucide="file-clock"></i>Sizning kontekstingiz</div><p class="muted">{{ p.notes }}</p>{% endif %}
+  </div>
+</div>
+
+<div class="card card-glow mt-3 reveal">
+  <div class="row-between" style="margin-bottom:12px">
+    <div class="card-title" style="margin:0"><i data-lucide="bot"></i>AI tahlilchi bilan suhbat</div>
+    <span class="chip {% if AI_ONLINE %}chip-live{% else %}chip-off{% endif %}">{% if AI_ONLINE %}Onlayn{% else %}Oflayn{% endif %}</span>
+  </div>
+  <div class="chat">
+    <div class="chat-log" id="chat-log">
+      <div class="msg assistant">Salom! Men SPACE RISK tahlilchisiman. {{ p.region.name }} boʻyicha ushbu prognoz haqida istalgan savolingizni bering. 🛰️</div>
+      {% for m in chat %}<div class="msg {{ m.role }}">{{ m.content }}</div>{% endfor %}
+    </div>
+    <div class="chat-suggest">
+      <button type="button">Eng katta xavf nima va nega?</button>
+      <button type="button">Birinchi navbatda qanday choralar koʻrish kerak?</button>
+      <button type="button">Qaysi tumanlar eng zaif?</button>
+      <button type="button">Iqlim oʻzgarishi qanday taʼsir qiladi?</button>
+    </div>
+    <form class="chat-form" id="chat-form">
+      <input class="input" id="chat-input" placeholder="Savolingizni yozing…" autocomplete="off" maxlength="800">
+      <button class="btn btn-primary" type="submit" aria-label="Yuborish"><i data-lucide="send"></i></button>
+    </form>
+  </div>
+</div>
+
+<form method="post" action="{% url 'risk:delete' p.pk %}" class="mt-3 center" onsubmit="return confirm('Prognozni oʻchirishni tasdiqlaysizmi?')">
+  {% csrf_token %}<button class="btn btn-danger btn-sm" type="submit"><i data-lucide="trash-2"></i>Prognozni oʻchirish</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ chart|json_script:"chart-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'js/charts.js' %}"></script>
+<script type="module">
+  import { createRiskTowers } from "{% static 'js/risk3d.js' %}";
+  const d = JSON.parse(document.getElementById("chart-data").textContent);
+  createRiskTowers(document.getElementById("bars3d"), d.bars3d, d.score, d.color);
+</script>
+<script>
+  const d = JSON.parse(document.getElementById("chart-data").textContent);
+  // gauge
+  setTimeout(() => { document.getElementById("gauge-val").style.strokeDashoffset = 518 * (1 - d.score / 100); }, 300);
+
+  // timeline
+  srChart(document.getElementById("timeline-chart"), {
+    type: "line",
+    data: {
+      labels: d.timeline.labels,
+      datasets: [
+        {
+          label: "Umumiy xavf", data: d.timeline.overall, borderColor: "#22d3ee", borderWidth: 3, tension: .4, fill: true, pointRadius: 4, pointHoverRadius: 7,
+          backgroundColor: (c) => c.chart.chartArea ? srGradient(c.chart.ctx, c.chart.chartArea, "rgba(34,211,238,.35)", "rgba(34,211,238,0)") : "transparent",
+        },
+        ...d.timeline.series.map(s => ({ label: s.label, data: s.data, borderColor: s.color, borderWidth: 1.6, borderDash: [5, 4], tension: .4, pointRadius: 0, fill: false })),
+      ],
+    },
+    options: {
+      maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+      scales: { y: { suggestedMin: 0, suggestedMax: 100, grid: {}, ticks: {} }, x: { grid: { display: false }, ticks: {} } },
+      plugins: { legend: { position: "bottom" } },
+    },
+  });
+
+  // radar
+  srChart(document.getElementById("radar-chart"), {
+    type: "radar",
+    data: {
+      labels: d.radar.labels,
+      datasets: [
+        { label: "Bugun", data: d.radar.now, borderColor: "#8b5cf6", backgroundColor: "rgba(139,92,246,.18)", borderWidth: 2, pointRadius: 3 },
+        { label: "Prognoz", data: d.radar.future, borderColor: d.color, backgroundColor: d.color + "33", borderWidth: 2.5, pointRadius: 4 },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: { r: { suggestedMin: 0, suggestedMax: 100, ticks: { display: false, stepSize: 20 }, grid: {}, angleLines: {}, pointLabels: { font: { size: 11, weight: 600 } } } },
+      plugins: { legend: { position: "bottom" } },
+    },
+  });
+
+  // chat
+  const log = document.getElementById("chat-log"), input = document.getElementById("chat-input");
+  log.scrollTop = log.scrollHeight;
+  function add(role, text) {
+    const el = document.createElement("div");
+    el.className = "msg " + role;
+    el.textContent = text;
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+    return el;
+  }
+  async function ask(q) {
+    add("user", q);
+    const typing = add("assistant typing", "");
+    typing.innerHTML = "<span></span><span></span><span></span>";
+    try {
+      const r = await fetch("{% url 'risk:ask' p.pk %}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+        body: JSON.stringify({ question: q }),
+      });
+      const data = await r.json();
+      typing.remove();
+      add("assistant", data.answer || data.error || "Xatolik");
+    } catch (e) {
+      typing.remove();
+      add("assistant", "⚠️ Tarmoq xatosi. Qayta urinib koʻring.");
+    }
+  }
+  document.getElementById("chat-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    input.value = "";
+    ask(q);
+  });
+  document.querySelectorAll(".chat-suggest button").forEach(b => b.addEventListener("click", () => ask(b.textContent)));
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "accounts/auth_base.html" %}
+{% block title %}Kirish{% endblock %}
+{% block quote %}
+  <span class="chip chip-live">Orbita faol</span>
+  <h2 class="mt-2">Qaytganingizdan xursandmiz, <span class="grad-text">kuzatuvchi</span>.</h2>
+  <p>Sunʼiy yoʻldoshlar sizning hududingizni kuzatishda davom etmoqda. Yangi prognozlar sizni kutmoqda.</p>
+{% endblock %}
+{% block form %}
+  <h1>Kirish</h1>
+  <p class="auth-sub">Hisobingizga kiring va xavf prognozlarini davom ettiring.</p>
+  {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {% include "accounts/_field.html" with field=form.username icon="user" %}
+    {% include "accounts/_field.html" with field=form.password icon="lock" password=True %}
+    <button class="btn btn-primary btn-lg btn-block mt-1" type="submit"><i data-lucide="log-in"></i>Kirish</button>
+  </form>
+  <p class="auth-switch">Hisobingiz yoʻqmi? <a href="{% url 'accounts:register' %}">Roʻyxatdan oʻting</a></p>
+{% endblock %}
