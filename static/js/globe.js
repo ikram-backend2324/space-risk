@@ -259,7 +259,8 @@ export function createGlobe(container, opts = {}) {
       if (o.tooltip) {
         if (obj) {
           const r = obj.userData.region;
-          o.tooltip.innerHTML = `<b>${r.name}</b><span class="badge" style="--c:${r.color}">${r.score}/100</span><div class="muted small" style="margin-top:6px">${r.top.join(" · ")}</div>`;
+          const esc = window.escapeHtml || ((s) => s);
+          o.tooltip.innerHTML = `<b>${esc(r.name)}</b><span class="badge" style="--c:${esc(r.color)}">${Number(r.score)}/100</span><div class="muted small" style="margin-top:6px">${r.top.map(esc).join(" · ")}</div>`;
           o.tooltip.style.left = e.clientX + 16 + "px";
           o.tooltip.style.top = e.clientY + 16 + "px";
           o.tooltip.classList.add("show");

@@ -82,14 +82,24 @@ export function createRiskTowers(el, bars, score, coreColor) {
     mesh.scale.y = 0.001;
     const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35 }));
     mesh.add(edges);
-    const label = labelSprite(b.label, String(b.score), b.color);
+    let label = labelSprite(b.label, String(b.score), b.color);
     label.position.set(mesh.position.x * 1.12, h + 0.45, mesh.position.z * 1.12);
     label.material.opacity = 0;
     // data link from core to tower top
     const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.8, 0), new THREE.Vector3(mesh.position.x, h, mesh.position.z)]);
     const link = new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0 }));
     scene.add(mesh, label, link);
-    towers.push({ mesh, label, link, h, delay: i * 0.12 });
+    towers.push({ mesh, label, link, h, delay: i * 0.12, bar: b });
+  });
+
+  // Re-draw label textures when the theme changes (text colour depends on it).
+  addEventListener("themechange", () => {
+    towers.forEach((tw) => {
+      const fresh = labelSprite(tw.bar.label, String(tw.bar.score), tw.bar.color);
+      tw.label.material.map.dispose();
+      tw.label.material.map = fresh.material.map;
+      tw.label.material.needsUpdate = true;
+    });
   });
 
   const controls = new OrbitControls(camera, renderer.domElement);

@@ -40,6 +40,22 @@
     setTimeout(() => { el.classList.add("hide"); setTimeout(() => el.remove(), 400); }, 4500 + i * 400);
   });
 
+  // ---- helpers shared with page scripts
+  const numberLocale = { en: "en-US", ru: "ru-RU", uz: "uz-UZ", kaa: "uz-UZ" }[root.lang] || "uz-UZ";
+  const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  window.escapeHtml = escapeHtml;
+  // Minimal, safe Markdown for AI answers: escape first, then **bold**, *italic*, `code`, bullet lines.
+  window.renderMarkdown = function (text) {
+    return escapeHtml(text)
+      .replace(/^#{1,6}\s*(.+)$/gm, "<b>$1</b>")
+      .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+      .replace(/(^|[^*])\*(?!\s)([^*\n]+?)\*(?!\*)/g, "$1<i>$2</i>")
+      .replace(/`([^`\n]+)`/g, "<code>$1</code>")
+      .replace(/^\s*[-*•]\s+/gm, "• ")
+      .replace(/^\s*(\d+)[.)]\s+/gm, "$1. ");
+  };
+  document.querySelectorAll("[data-markdown]").forEach((el) => { el.innerHTML = window.renderMarkdown(el.textContent); });
+
   // ---- reveal on scroll + animated counters/bars
   function animateCount(el) {
     const target = parseFloat(el.dataset.count);
@@ -48,7 +64,7 @@
     (function step(now) {
       const k = Math.min(1, (now - t0) / dur);
       const v = target * (1 - Math.pow(1 - k, 4));
-      el.textContent = v.toLocaleString("uz-UZ", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+      el.textContent = v.toLocaleString(numberLocale, { minimumFractionDigits: dec, maximumFractionDigits: dec });
       if (k < 1) requestAnimationFrame(step);
     })(t0);
   }

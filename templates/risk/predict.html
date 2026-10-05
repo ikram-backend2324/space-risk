@@ -83,7 +83,7 @@
   const info = document.getElementById("region-info");
   function showInfo(slug) {
     const r = regions.find(x => x.slug === slug);
-    info.innerHTML = r ? `<span class="badge" style="--c:${r.color}">${T("map_baseline")} ${r.score}/100</span> &nbsp;${T("map_main")}: ${r.top.join(", ")}` : "";
+    info.innerHTML = r ? `<span class="badge" style="--c:${escapeHtml(r.color)}">${escapeHtml(T("map_baseline"))} ${Number(r.score)}/100</span> &nbsp;${escapeHtml(T("map_main"))}: ${r.top.map(escapeHtml).join(", ")}` : "";
   }
   const rmap = createRiskMap(document.getElementById("pick-map"), regions, {
     onSelect: (slug) => { select.value = slug; showInfo(slug); select.classList.add("pulse"); },

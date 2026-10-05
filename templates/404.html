@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}404{% endblock %}
+{% block content %}
+<div class="card card-glow center reveal" style="max-width:620px;margin:40px auto;padding:48px 24px">
+  <img src="{% static 'img/logo-mark.svg' %}" alt="" width="96" height="96" style="filter:drop-shadow(0 0 24px rgba(34,211,238,.5))">
+  <h1 class="display mt-2" style="font-size:clamp(3rem,12vw,5rem)"><span class="grad-text">404</span></h1>
+  <h2 style="font-size:1.4rem">{% t "err.404_title" %}</h2>
+  <p class="muted mt-1">{% t "err.404_text" %}</p>
+  <a href="{% url 'risk:landing' %}" class="btn btn-primary mt-3"><i data-lucide="globe"></i>{% t "err.home" %}</a>
+</div>
+{% endblock %}

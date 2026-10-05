@@ -20,6 +20,11 @@ admin.site.unregister(User)
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     inlines = [ProfileInline]
+
+    def get_inlines(self, request, obj):
+        # On "add user" the post_save signal creates the profile; an inline there would duplicate it.
+        return [ProfileInline] if obj else []
+
     list_display = ("username", "email", "first_name", "last_name", "organization", "prediction_count", "is_staff", "date_joined")
     list_filter = ("is_staff", "is_superuser", "is_active", "date_joined")
 

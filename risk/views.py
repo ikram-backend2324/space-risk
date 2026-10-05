@@ -3,6 +3,7 @@ import logging
 from urllib.parse import urlparse
 
 from django.conf import settings
+from django.core.cache import cache
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
@@ -17,6 +18,15 @@ from .i18n import t
 from .models import ChatMessage, Prediction, Region
 
 log = logging.getLogger("risk")
+
+
+def _throttled(request, action, seconds):
+    """True if this user did ``action`` less than ``seconds`` ago (protects the OpenRouter budget)."""
+    key = f"rl:{action}:{request.user.pk}"
+    if cache.get(key):
+        return True
+    cache.set(key, 1, seconds)
+    return False
 
 
 def _regions_payload():
@@ -128,6 +138,9 @@ def predict(request):
             messages.error(request, t("msg.pick_hazard"))
             return redirect(f"{request.path}?region={region.slug}")
         notes = request.POST.get("notes", "").strip()[:1000]
+        if _throttled(request, "predict", 15):
+            messages.warning(request, t("msg.slow_down"))
+            return redirect(f"{request.path}?region={region.slug}")
 
         lang = request.LANG
         result, source, model_name = ai.forecast(region, selected, horizon, notes, lang=lang)
@@ -222,6 +235,8 @@ def ask(request, pk):
     if not question:
         return JsonResponse({"error": t("ai.empty_question")}, status=400)
     question = question[:800]
+    if _throttled(request, "ask", 4):
+        return JsonResponse({"error": t("msg.slow_down")}, status=429)
     history_msgs = list(pred.messages.all())
     answer = ai.ask(pred, question, history_msgs, lang=request.LANG)
     ChatMessage.objects.create(prediction=pred, role="user", content=question)

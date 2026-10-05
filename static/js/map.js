@@ -1,6 +1,7 @@
 // Leaflet risk map of Uzbekistan with theme-aware tiles.
 window.createRiskMap = function (el, regions, opts = {}) {
   const T = window.T || ((k) => k);
+  const esc = window.escapeHtml || ((s) => s);
   const map = L.map(el, { zoomControl: true, scrollWheelZoom: false, attributionControl: true }).setView([41.2, 64.2], 6);
   const esri = (path) => `https://server.arcgisonline.com/ArcGIS/rest/services/${path}/MapServer/tile/{z}/{y}/{x}`;
   const attribution = "Tiles &copy; Esri — Maxar, Earthstar Geographics";
@@ -35,12 +36,12 @@ window.createRiskMap = function (el, regions, opts = {}) {
     });
     const m = L.marker([r.lat, r.lng], { icon, title: r.name }).addTo(map);
     const action = opts.onSelect
-      ? `<button class="btn btn-primary btn-sm mt-1" data-pick="${r.slug}">${T("map_pick")}</button>`
-      : `<a class="btn btn-primary btn-sm mt-1" href="${opts.predictUrl || "/predict/"}?region=${r.slug}">${T("map_forecast")}</a>`;
+      ? `<button class="btn btn-primary btn-sm mt-1" data-pick="${esc(r.slug)}">${T("map_pick")}</button>`
+      : `<a class="btn btn-primary btn-sm mt-1" href="${opts.predictUrl || "/predict/"}?region=${encodeURIComponent(r.slug)}">${T("map_forecast")}</a>`;
     m.bindPopup(
-      `<div style="min-width:190px"><b style="font-family:'Space Grotesk';font-size:1.05rem">${r.name}</b>
-       <div style="margin:6px 0"><span class="badge" style="--c:${r.color}">${T("map_baseline")} ${r.score}/100</span></div>
-       <div class="muted small">${T("map_main")}: ${r.top.join(", ")}</div>
+      `<div style="min-width:190px"><b style="font-family:'Space Grotesk';font-size:1.05rem">${esc(r.name)}</b>
+       <div style="margin:6px 0"><span class="badge" style="--c:${esc(r.color)}">${esc(T("map_baseline"))} ${Number(r.score)}/100</span></div>
+       <div class="muted small">${esc(T("map_main"))}: ${r.top.map(esc).join(", ")}</div>
        <div class="muted small">${T("map_population")}: ${(r.population / 1e6).toFixed(2)} ${T("mln")}</div>${action}</div>`
     );
     if (opts.onSelect) m.on("click", () => opts.onSelect(r.slug));

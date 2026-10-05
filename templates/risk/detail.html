@@ -110,7 +110,7 @@
   <div class="chat">
     <div class="chat-log" id="chat-log">
       <div class="msg assistant">{% t "detail.chat_hello" region=p.region.display_name %}</div>
-      {% for m in chat %}<div class="msg {{ m.role }}">{{ m.content }}</div>{% endfor %}
+      {% for m in chat %}<div class="msg {{ m.role }}"{% if m.role == "assistant" %} data-markdown{% endif %}>{{ m.content }}</div>{% endfor %}
     </div>
     <div class="chat-suggest">
       <button type="button">{% t "detail.q1" %}</button>
@@ -187,7 +187,7 @@
   function add(role, text) {
     const el = document.createElement("div");
     el.className = "msg " + role;
-    el.textContent = text;
+    if (role === "assistant") el.innerHTML = renderMarkdown(text); else el.textContent = text;
     log.appendChild(el);
     log.scrollTop = log.scrollHeight;
     return el;

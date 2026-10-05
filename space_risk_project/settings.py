@@ -117,6 +117,10 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30  # browsers stick to HTTPS for 30 days (Render serves HTTPS)
+    if SECRET_KEY.startswith("dev-only-"):
+        import warnings
+        warnings.warn("SECRET_KEY is not set — set a long random SECRET_KEY environment variable in production.")
 
 # ---------------------------------------------------------------- OpenRouter
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
