@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import password_validation
+from django.contrib.auth.forms import AuthenticationForm
 
 from risk.i18n import t
 
@@ -58,60 +59,63 @@ class LocalizedMixin:
 
 
 class LoginForm(LocalizedMixin, AuthenticationForm):
-    labels = {"username": "field.username", "password": "field.password"}
+    labels = {"username": "field.login", "password": "field.password"}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._localize_fields()
+        self.fields["username"].widget.attrs.update({"autocapitalize": "none", "autocomplete": "username"})
 
 
-class RegisterForm(LocalizedMixin, UserCreationForm):
+class RegisterForm(LocalizedMixin, forms.ModelForm):
+    """Short sign-up: name, username, email, password (min. 6 characters, no confirmation)."""
+
     first_name = forms.CharField(max_length=60)
-    last_name = forms.CharField(max_length=60, required=False)
     email = forms.EmailField()
-    organization = forms.CharField(max_length=160, required=False)
+    password = forms.CharField(strip=False, widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}))
 
     labels = {
         "first_name": "field.first_name",
-        "last_name": "field.last_name",
         "username": "field.username",
         "email": "field.email",
-        "organization": "field.organization",
-        "password1": "field.password",
-        "password2": "field.password_confirm",
+        "password": "field.password",
     }
-    placeholders = {
-        "email": "field.email_ph",
-        "organization": "field.organization_ph",
-        "password1": "field.password_ph",
-        "password2": "field.password_repeat_ph",
-    }
+    placeholders = {"email": "field.email_ph", "password": "field.password_ph"}
 
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "username", "email")
+        fields = ("first_name", "username", "email")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._localize_fields()
-        self.fields["password1"].widget.attrs["data-pw-meter"] = "#pw-meter"
+        self.fields["username"].widget.attrs.update({"autocapitalize": "none", "autocomplete": "username"})
+        self.fields["email"].widget.attrs.update({"autocomplete": "email", "inputmode": "email"})
+        self.fields["password"].widget.attrs["data-pw-meter"] = "#pw-meter"
+
+    def clean_username(self):
+        username = self.cleaned_data["username"].strip()
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError("taken", code="unique")
+        return username
 
     def clean_email(self):
-        email = self.cleaned_data["email"].lower()
+        email = self.cleaned_data["email"].strip().lower()
         if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError("email taken", code="email_taken")
         return email
 
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        password_validation.validate_password(password)
+        return password
+
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.email = self.cleaned_data["email"]
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data.get("last_name", "")
+        user.set_password(self.cleaned_data["password"])
         if commit:
             user.save()
-            Profile.objects.update_or_create(
-                user=user, defaults={"organization": self.cleaned_data.get("organization", "")}
-            )
+            Profile.objects.get_or_create(user=user)
         return user
 
 

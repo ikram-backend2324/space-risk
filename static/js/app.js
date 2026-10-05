@@ -89,14 +89,13 @@
   document.querySelectorAll("[data-pw-meter]").forEach((input) => {
     const bar = document.querySelector(input.dataset.pwMeter + " span");
     input.addEventListener("input", () => {
+      // Only rule: 6+ characters. Below that the bar fills in red/orange; from 6 on it is green.
       const v = input.value;
-      let s = 0;
-      if (v.length >= 8) s++;
-      if (/[A-Z]/.test(v) && /[a-z]/.test(v)) s++;
-      if (/\d/.test(v)) s++;
-      if (/[^A-Za-z0-9]/.test(v) || v.length >= 12) s++;
-      bar.style.width = (s / 4) * 100 + "%";
-      bar.style.background = ["#f43f5e", "#f97316", "#eab308", "#22c55e", "#22c55e"][s];
+      const ok = v.length >= 6;
+      let pct = Math.min(100, (v.length / 6) * 60);
+      if (ok) pct = 60 + Math.min(40, (v.length - 6) * 8 + (/\d/.test(v) ? 10 : 0) + (/[^A-Za-z0-9]/.test(v) ? 10 : 0));
+      bar.style.width = (v ? pct : 0) + "%";
+      bar.style.background = ok ? "#22c55e" : v.length >= 3 ? "#f97316" : "#f43f5e";
     });
   });
 

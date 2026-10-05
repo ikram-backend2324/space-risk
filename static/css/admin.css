@@ -1,10 +1,39 @@
-/* SPACE RISK branding for the Jazzmin admin */
+/* SPACE RISK branding + mobile fixes for the Jazzmin admin */
 .brand-link .brand-image { opacity: 1 !important; box-shadow: none !important; background: transparent; }
-.login-logo img { max-width: 300px; }
+.login-logo img { max-width: min(300px, 80vw); height: auto; }
 .login-page, .register-page {
   background: radial-gradient(900px 600px at 80% -10%, rgba(99,102,241,.35), transparent 60%),
               radial-gradient(800px 500px at -10% 110%, rgba(34,211,238,.22), transparent 60%), #050816 !important;
 }
+.login-box { width: min(380px, calc(100vw - 32px)) !important; }
 .login-box .card { border-radius: 18px; overflow: hidden; border: 1px solid rgba(148,163,255,.18); }
 .main-sidebar .brand-text { letter-spacing: .08em; font-weight: 700 !important; }
 .content-wrapper { background-image: radial-gradient(900px 600px at 100% 0, rgba(99,102,241,.08), transparent 60%); }
+
+/* Tables scroll inside their card instead of stretching the page */
+#result_list, .table { width: 100%; }
+#changelist-form .results, .card-body.table-responsive, .results { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ---------- phones ---------- */
+@media (max-width: 767.98px) {
+  .main-header .navbar-nav .nav-item.d-none.d-sm-inline-block { display: none !important; }
+  .main-header form.form-inline { flex: 1 1 auto; min-width: 0; }
+  .main-header form.form-inline .form-control { min-width: 0; }
+  .main-header .navbar { flex-wrap: nowrap; }
+  .content-header h1 { font-size: 1.4rem; }
+  .content-header .breadcrumb { float: none !important; margin-top: .5rem; padding: .35rem .6rem; font-size: .85rem; }
+  .content-wrapper > .content { padding: 0 .5rem; }
+  /* dashboard app list: model name on top, buttons below, full width */
+  body.dashboard #content-main .table td, body.dashboard #content-main .table th { white-space: normal; }
+  body.dashboard #content-main .table tr { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; padding: .35rem 0; }
+  body.dashboard #content-main .table tr > * { border: 0; padding: .25rem .5rem; }
+  body.dashboard #content-main .table tr > :first-child { flex: 1 1 100%; }
+  /* change lists: keep rows intact, scroll the table sideways */
+  #result_list { min-width: 640px; }
+  #result_list th, #result_list td { white-space: nowrap; }
+  .card-title { font-size: 1.1rem; word-break: normal; overflow-wrap: anywhere; }
+  .object-tools, .object-tools li { float: none !important; display: block; margin: .25rem 0; }
+  .submit-row, .submit-row .btn { width: 100%; }
+  .card-body { padding: .75rem; }
+  .actions select, .actions .btn { margin-bottom: .4rem; }
+}

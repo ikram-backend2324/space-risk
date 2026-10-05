@@ -218,11 +218,16 @@ export function createGlobe(container, opts = {}) {
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     const narrow = w < 860;
+    // On portrait phones the globe sits above the text: back off so the whole Earth fits.
+    distance = o.distance * (w / h < 0.8 ? 1.32 : 1);
+    if (intro >= 1) camera.position.setLength(distance);
     const ox = narrow ? 0 : -w * o.offsetX;
     const oy = h * (narrow ? o.narrowOffsetY : o.offsetY);
     camera.setViewOffset(w, h, ox, oy, w, h);
     camera.updateProjectionMatrix();
   }
+  let distance = o.distance;
+  let intro = 0;
   resize();
   new ResizeObserver(resize).observe(container);
 
@@ -271,9 +276,8 @@ export function createGlobe(container, opts = {}) {
   }
 
   // --- Intro fly-in
-  const startDist = o.distance * 2.4;
+  const startDist = distance * 2.4;
   camera.position.setLength(startDist);
-  let intro = 0;
 
   // --- Loop
   const clock = new THREE.Clock();
@@ -290,7 +294,7 @@ export function createGlobe(container, opts = {}) {
     if (intro < 1) {
       intro = Math.min(1, intro + dt * 0.45);
       const k = 1 - Math.pow(1 - intro, 3);
-      camera.position.setLength(startDist + (o.distance - startDist) * k);
+      camera.position.setLength(startDist + (distance - startDist) * k);
     }
     if (!hovered) spin.rotation.y += o.autoRotate;
 

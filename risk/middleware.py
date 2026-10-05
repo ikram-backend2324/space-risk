@@ -16,10 +16,16 @@ class LanguageMiddleware:
             or i18n.from_accept_language(request.META.get("HTTP_ACCEPT_LANGUAGE"))
             or i18n.DEFAULT
         )
+        if request.path.startswith("/admin/"):
+            lang = "uz"
         i18n.set_lang(lang)
         request.LANG = lang
-        # Django has no Karakalpak catalog — its own built-in strings (admin) fall back to Uzbek.
-        translation.activate("uz" if lang == "kaa" else lang)
+        # The admin's model names are Uzbek, so keep the whole admin in Uzbek.
+        # (Django also has no Karakalpak catalog.)
+        if request.path.startswith("/admin/") or lang == "kaa":
+            translation.activate("uz")
+        else:
+            translation.activate(lang)
         response = self.get_response(request)
         response.headers.setdefault("Content-Language", lang)
         translation.deactivate()

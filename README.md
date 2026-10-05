@@ -55,13 +55,12 @@ Open http://127.0.0.1:8000 · Admin: http://127.0.0.1:8000/admin/
 Or use the included `render.yaml` blueprint, which creates the web service and the database together.
 
 ## Logo / brand assets
-All in `branding/`:
-- `logo-mark.svg`: icon (vector, master file)
-- `logo.svg` / `logo-light.svg`: full logo with wordmark for dark / light backgrounds
-- `logo-mark-1024.png`, `logo-mark-dark-bg.png`: 1024×1024 PNG icon (transparent / dark background)
-- `logo-dark-bg.png`, `logo-light-bg.png`: 2400×512 PNG full logo for slides
+All in `logo/` (see `logo/README.txt`):
+- `logo/svg/`: vector masters (`logo.svg`, `logo-light.svg`, `logo-mark.svg`)
+- `logo/png/`: ready-to-use PNGs (2400×512 full logo on dark/white, icon in 1024/512/256 px)
+- `logo/favicon/`: favicon.ico, iPhone and Android home-screen icons
 
-The website uses copies in `static/img/`.
+The website uses copies in `static/img/` and `static/img/icons/`.
 
 ## Project layout
 ```
@@ -70,5 +69,5 @@ accounts/          register, login, profile
 risk/              models, views, OpenRouter client (ai.py), fallback engine (engine.py), hazard + region data, seed command
 templates/         Django templates
 static/            css, js (globe.js, risk3d.js, space-bg.js, map.js, charts.js), vendored three.js + lucide, Earth textures
-branding/          logo files
+logo/              logo files (svg, png, favicon)
 ```

@@ -68,17 +68,17 @@
   </div>
   {% if recent %}
   <div class="table-wrap">
-    <table class="table">
+    <table class="table table-stack">
       <thead><tr><th>{% t "th.region" %}</th><th>{% t "th.horizon" %}</th><th>{% t "th.risk" %}</th><th>{% t "th.source" %}</th><th>{% t "th.date" %}</th><th></th></tr></thead>
       <tbody>
       {% for p in recent %}
         <tr>
-          <td><b>{{ p.region.display_name }}</b></td>
-          <td>{{ p.horizon_years|years }} → {{ p.target_year }}</td>
-          <td><span class="badge" style="--c:{{ p.color }}">{{ p.overall_score|floatformat:0 }} · {{ p.level_label }}</span></td>
-          <td class="muted small">{% if p.source == "ai" %}🤖 {% t "src.ai" %}{% else %}⚙️ {% t "src.engine" %}{% endif %}</td>
-          <td class="muted small">{{ p.created_at|ago }}</td>
-          <td><a href="{{ p.get_absolute_url }}" class="btn btn-sm">{% t "btn.open" %}</a></td>
+          <td data-label="{% t 'th.region' %}"><b>{{ p.region.display_name }}</b></td>
+          <td data-label="{% t 'th.horizon' %}">{{ p.horizon_years|years }} → {{ p.target_year }}</td>
+          <td data-label="{% t 'th.risk' %}"><span class="badge" style="--c:{{ p.color }}">{{ p.overall_score|floatformat:0 }} · {{ p.level_label }}</span></td>
+          <td class="muted small" data-label="{% t 'th.source' %}">{% if p.source == "ai" %}🤖 {% t "src.ai" %}{% else %}⚙️ {% t "src.engine" %}{% endif %}</td>
+          <td class="muted small" data-label="{% t 'th.date' %}">{{ p.created_at|ago }}</td>
+          <td class="td-action"><a href="{{ p.get_absolute_url }}" class="btn btn-sm">{% t "btn.open" %}</a></td>
         </tr>
       {% endfor %}
       </tbody>

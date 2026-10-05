@@ -15,6 +15,8 @@
       <a href="{% url 'risk:landing' %}#features"><i data-lucide="sparkles"></i>{% t "nav.features" %}</a>
       <a href="{% url 'risk:landing' %}#hazards"><i data-lucide="shield-alert"></i>{% t "nav.hazards" %}</a>
       <a href="{% url 'risk:landing' %}#how"><i data-lucide="satellite"></i>{% t "nav.how" %}</a>
+      <a href="{% url 'accounts:login' %}" class="mobile-only"><i data-lucide="log-in"></i>{% t "nav.login" %}</a>
+      <a href="{% url 'accounts:register' %}" class="mobile-only"><i data-lucide="rocket"></i>{% t "nav.start" %}</a>
     {% endif %}
   </nav>
 
@@ -42,8 +44,8 @@
         </div>
       </div>
     {% else %}
-      <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-sm">{% t "nav.login" %}</a>
-      <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">{% t "nav.start" %}</a>
+      <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-sm nav-guest">{% t "nav.login" %}</a>
+      <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm nav-guest">{% t "nav.start" %}</a>
     {% endif %}
     <button class="icon-btn menu-toggle" data-menu-toggle type="button" aria-label="{% t 'nav.menu' %}"><i data-lucide="menu"></i></button>
   </div>

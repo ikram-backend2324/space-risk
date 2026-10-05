@@ -83,12 +83,13 @@ DATABASES = {
     )
 }
 
+# Kept deliberately simple for new users: just a minimum length.
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8}},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 6}},
 ]
+
+# Log in with username or email
+AUTHENTICATION_BACKENDS = ["accounts.backends.UsernameOrEmailBackend"]
 
 LANGUAGE_CODE = "uz"
 # UI languages (Karakalpak has no Django catalog — see risk/i18n.py)
@@ -142,7 +143,7 @@ JAZZMIN_SETTINGS = {
     "site_icon": "img/logo-mark.svg",
     "welcome_sign": "SPACE RISK boshqaruv paneliga xush kelibsiz",
     "copyright": "SPACE RISK · UzCosmos",
-    "search_model": ["auth.User", "risk.Prediction", "risk.Region"],
+    "search_model": ["risk.Prediction"],
     "topmenu_links": [
         {"name": "Saytga qaytish", "url": "risk:landing", "new_window": False},
         {"name": "Dashboard", "url": "risk:dashboard", "new_window": False},
@@ -164,7 +165,7 @@ JAZZMIN_SETTINGS = {
     "default_icon_children": "fas fa-circle",
     "related_modal_active": True,
     "custom_css": "css/admin.css",
-    "show_ui_builder": True,
+    "show_ui_builder": False,  # the theme-builder panel breaks the layout on phones
     "changeform_format": "horizontal_tabs",
 }
 

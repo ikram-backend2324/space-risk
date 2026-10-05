@@ -107,6 +107,11 @@ export function createRiskTowers(el, bars, score, coreColor) {
     const w = el.clientWidth, h = el.clientHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
+    // Narrow (phone) viewports: pull the camera back so side labels stay in frame.
+    const dist = 8.9 * Math.max(1, Math.pow(1.6 / camera.aspect, 0.55));
+    const dir = camera.position.clone().sub(controls.target).normalize();
+    camera.position.copy(controls.target).add(dir.multiplyScalar(dist));
+    controls.maxDistance = Math.max(13, dist * 1.4);
     camera.updateProjectionMatrix();
   }
   resize();
