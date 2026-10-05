@@ -7,11 +7,12 @@ function labelSprite(text, sub, color) {
   c.width = 512; c.height = 160;
   const g = c.getContext("2d");
   const dark = document.documentElement.dataset.theme !== "light";
-  g.font = "600 44px 'Space Grotesk', 'Inter', sans-serif";
+  const head = ["ru", "kaa"].includes(document.documentElement.lang) ? "'Inter'" : "'Space Grotesk', 'Inter'";
+  g.font = `600 44px ${head}, sans-serif`;
   g.textAlign = "center";
   g.fillStyle = dark ? "#e8ecff" : "#0b1230";
   g.fillText(text, 256, 62);
-  g.font = "700 52px 'Space Grotesk', sans-serif";
+  g.font = `700 52px ${head}, sans-serif`;
   g.fillStyle = color;
   g.fillText(sub, 256, 128);
   const t = new THREE.CanvasTexture(c);
@@ -26,6 +27,9 @@ export function createRiskTowers(el, bars, score, coreColor) {
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   el.appendChild(renderer.domElement);
+  // Canvas is rendered at devicePixelRatio but must display at the container's CSS size
+  // (otherwise phones with 2–3× screens show the scene enlarged and off-centre).
+  Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block" });
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);

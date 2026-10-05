@@ -166,3 +166,12 @@ h1, h2, h3 { overflow-wrap: anywhere; }
 
 /* Karakalpak: browsers upper-case "ı" as "I" (correct is "Í"), so keep labels in their written case */
 html:lang(kaa) * { text-transform: none !important; }
+
+/* Space Grotesk has no Cyrillic and no Karakalpak "ǵ": use Inter for headings in Russian/Karakalpak
+   so letters never switch fonts in the middle of a word. */
+html:lang(ru) h1, html:lang(ru) h2, html:lang(ru) h3, html:lang(ru) h4, html:lang(ru) .display, html:lang(ru) .brand,
+html:lang(ru) .stat b, html:lang(ru) .hero-meta b, html:lang(ru) .gauge .lbl b, html:lang(ru) .meta-grid b, html:lang(ru) .hz-row .sc,
+html:lang(kaa) h1, html:lang(kaa) h2, html:lang(kaa) h3, html:lang(kaa) h4, html:lang(kaa) .display, html:lang(kaa) .brand,
+html:lang(kaa) .stat b, html:lang(kaa) .hero-meta b, html:lang(kaa) .gauge .lbl b, html:lang(kaa) .meta-grid b, html:lang(kaa) .hz-row .sc {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}

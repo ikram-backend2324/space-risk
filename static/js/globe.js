@@ -11,6 +11,7 @@ export function latLngToVec3(lat, lng, r = 1) {
   return new THREE.Vector3(-r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta));
 }
 
+const TOUCH = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
 const isDark = () => document.documentElement.dataset.theme !== "light";
 
 const earthVert = /* glsl */ `
@@ -92,6 +93,9 @@ export function createGlobe(container, opts = {}) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   container.appendChild(renderer.domElement);
+  // Canvas is rendered at devicePixelRatio but must display at the container's CSS size
+  // (otherwise phones with 2–3× screens show the scene enlarged and off-centre).
+  Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block" });
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
@@ -153,7 +157,8 @@ export function createGlobe(container, opts = {}) {
     ring.position.copy(normal.clone().multiplyScalar(1.002));
     ring.lookAt(normal.clone().multiplyScalar(2));
     // invisible, larger hit target
-    const hit = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), new THREE.MeshBasicMaterial({ visible: false }));
+    // Bigger invisible tap target on touch screens (a fingertip is much less precise than a mouse).
+    const hit = new THREE.Mesh(new THREE.SphereGeometry(TOUCH ? 0.085 : 0.04, 8, 8), new THREE.MeshBasicMaterial({ visible: false }));
     hit.position.copy(cap.position);
     hit.userData = { region: r, ring, beam, cap };
     spin.add(beam, cap, ring, hit);
@@ -235,6 +240,8 @@ export function createGlobe(container, opts = {}) {
   const ray = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
   let hovered = null;
+  let touching = false;
+  let lastTouch = 0;
   let downAt = null;
   function pick(e) {
     const rect = renderer.domElement.getBoundingClientRect();
@@ -267,9 +274,11 @@ export function createGlobe(container, opts = {}) {
         } else o.tooltip.classList.remove("show");
       }
     });
-    renderer.domElement.addEventListener("pointerdown", (e) => { downAt = [e.clientX, e.clientY]; });
+    renderer.domElement.addEventListener("pointerdown", (e) => { downAt = [e.clientX, e.clientY]; touching = true; });
+    renderer.domElement.addEventListener("pointercancel", () => { touching = false; });
     renderer.domElement.addEventListener("pointerup", (e) => {
-      if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 5) return;
+      touching = false; lastTouch = performance.now();
+      if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > (TOUCH ? 14 : 5)) return;
       const obj = pick(e);
       if (obj && o.onSelect) o.onSelect(obj.userData.region);
     });
@@ -297,7 +306,8 @@ export function createGlobe(container, opts = {}) {
       const k = 1 - Math.pow(1 - intro, 3);
       camera.position.setLength(startDist + (distance - startDist) * k);
     }
-    if (!hovered) spin.rotation.y += o.autoRotate;
+    // Pause auto-rotation while hovering/touching (and briefly after a touch) so regions are easy to tap.
+    if (!hovered && !touching && performance.now() - lastTouch > 2500) spin.rotation.y += o.autoRotate;
 
     markers.forEach((m) => {
       const s = ((t * 0.6 + m.phase) % 1);
