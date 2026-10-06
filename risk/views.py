@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.db.models import Avg, Count
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -197,12 +198,18 @@ def predict(request):
     return render(request, "risk/predict.html", ctx)
 
 
-@login_required
 def detail(request, pk):
-    pred = get_object_or_404(Prediction.objects.select_related("region"), pk=pk, user=request.user)
+    pred = get_object_or_404(Prediction.objects.select_related("region"), pk=pk)
+    owner = request.user.is_authenticated and pred.user_id == request.user.id
+    if not owner:
+        # Links shared from the app / bot carry a signed token: read-only view for anyone.
+        if not pred.share_valid(request.GET.get("share")):
+            if not request.user.is_authenticated:
+                return redirect_to_login(request.get_full_path())
+            raise Http404
     lang = request.LANG
     rows = pred.hazard_rows()
-    text = localized_text(pred, lang)
+    text = localized_text(pred, lang, allow_ai=owner)
     labels = [label for label, _ in engine.timeline_points(pred.horizon_years, lang, start=pred.created_at.year)]
     if len(labels) != len(pred.timeline):
         labels = [p.get("label", "") for p in pred.timeline]
@@ -231,7 +238,7 @@ def detail(request, pk):
     return render(request, "risk/detail.html", {
         "p": pred, "rows": rows, "chart": chart, "chat": pred.messages.filter(language=lang), "text": text,
         "sources": [source_label(s, lang) for s in pred.satellite_sources],
-        "horizon_text": i18n.years(pred.horizon_years),
+        "horizon_text": i18n.years(pred.horizon_years), "owner": owner,
     })
 
 

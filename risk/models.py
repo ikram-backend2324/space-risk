@@ -106,6 +106,18 @@ class Prediction(models.Model):
     def get_absolute_url(self):
         return reverse("risk:detail", args=[self.pk])
 
+    def share_token(self):
+        """Signed token that lets anyone with the link view this forecast read-only (no chat, no delete)."""
+        from django.core import signing
+        return signing.Signer(salt="risk.share").sign(str(self.pk)).rsplit(":", 1)[1]
+
+    def share_url(self):
+        return f"{self.get_absolute_url()}?share={self.share_token()}"
+
+    def share_valid(self, token):
+        import hmac
+        return bool(token) and hmac.compare_digest(str(token), self.share_token())
+
     @property
     def color(self):
         return LEVEL_COLORS.get(self.level, "#64748b")

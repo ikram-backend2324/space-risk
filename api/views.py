@@ -138,7 +138,7 @@ def forecast_detail(pred, lang):
         "sources": [source_label(s, lang) for s in pred.satellite_sources],
         "chat": [{"role": m.role, "content": m.content, "created_at": m.created_at.isoformat()}
                  for m in pred.messages.filter(language=lang)],
-        "web_url": settings.SITE_URL.rstrip("/") + pred.get_absolute_url(),
+        "web_url": settings.SITE_URL.rstrip("/") + pred.share_url(),   # opens read-only in any browser, no login
     })
     return data
 

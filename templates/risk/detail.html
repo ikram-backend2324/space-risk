@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-head row-between reveal">
   <div>
-    <a href="{% url 'risk:history' %}" class="muted small">{% t "detail.back" %}</a>
+    {% if owner %}<a href="{% url 'risk:history' %}" class="muted small">{% t "detail.back" %}</a>{% endif %}
     <h1 class="mt-1">{{ p.region.display_name }}</h1>
     <p>{% t "detail.horizon_label" years=horizon_text %} · {{ p.created_at|date:"d.m.Y H:i" }} · {% if p.source == "ai" %}🤖 {{ p.model_name }}{% else %}⚙️ {% t "src.engine" %}{% endif %}</p>
   </div>
@@ -102,6 +102,7 @@
   </div>
 </div>
 
+{% if owner %}
 <div class="card card-glow mt-3 reveal">
   <div class="row-between" style="margin-bottom:12px">
     <div class="card-title" style="margin:0"><i data-lucide="bot"></i>{% t "feat.chat.t" %}</div>
@@ -128,6 +129,7 @@
 <form method="post" action="{% url 'risk:delete' p.pk %}" class="mt-3 center" data-confirm="{% t 'detail.delete_confirm' %}" onsubmit="return confirm(this.dataset.confirm)">
   {% csrf_token %}<button class="btn btn-danger btn-sm" type="submit"><i data-lucide="trash-2"></i>{% t "detail.delete" %}</button>
 </form>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
@@ -181,8 +183,9 @@
     },
   });
 
-  // chat
+  // chat (owner only — a shared read-only link has no chat)
   const log = document.getElementById("chat-log"), input = document.getElementById("chat-input");
+  if (log) {
   log.scrollTop = log.scrollHeight;
   function add(role, text) {
     const el = document.createElement("div");
@@ -218,5 +221,6 @@
     ask(q);
   });
   document.querySelectorAll(".chat-suggest button").forEach(b => b.addEventListener("click", () => ask(b.textContent)));
+  }
 </script>
 {% endblock %}
