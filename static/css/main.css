@@ -474,3 +474,30 @@ select.input option { background: var(--surface-solid); color: var(--text); }
 .lang-check { margin-left: auto; color: var(--accent) !important; }
 .translated-note { font-size: .78rem; color: var(--muted); margin-top: 10px; }
 @media (max-width: 520px) { .lang-btn span { display: none; } .lang-btn { padding: 0; width: 40px; justify-content: center; } }
+
+/* ---------- mobile app & Telegram bot ---------- */
+.apps-grid { align-items: stretch; }
+.app-card { display: flex; flex-direction: column; gap: 14px; }
+.app-head { display: flex; align-items: center; gap: 14px; }
+.app-head h3 { font-size: 1.25rem; }
+.app-handle { color: var(--accent) !important; font-weight: 600; }
+.app-ic { width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center; color: #fff; flex: none; box-shadow: 0 10px 26px -10px var(--c); }
+.app-ic svg { width: 26px; height: 26px; }
+.app-body { display: flex; gap: 18px; align-items: center; margin-top: auto; }
+.qr { flex: none; display: block; padding: 10px; background: #fff; border-radius: 18px; box-shadow: 0 12px 30px -14px rgba(0,0,0,.6); transition: transform .25s; }
+.qr:hover { transform: scale(1.04) rotate(-1deg); }
+.qr img { display: block; width: 130px; height: 130px; image-rendering: pixelated; }
+.app-actions { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.app-actions .small svg { width: 14px; height: 14px; vertical-align: -2px; }
+.btn-tg { background: linear-gradient(120deg, #2AABEE, #229ED9); box-shadow: 0 10px 30px -10px rgba(34,158,217,.8); }
+.btn-android { background: linear-gradient(120deg, #3DDC84, #16a34a); box-shadow: 0 10px 30px -10px rgba(61,220,132,.7); color: #04130a; }
+.btn-android svg { color: #04130a; }
+.footer-links { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.footer-links a { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-weight: 600; }
+.footer-links a:hover { color: var(--text); }
+.footer-links svg { width: 16px; height: 16px; }
+@media (max-width: 600px) {
+  .app-body { flex-direction: column; align-items: stretch; }
+  .qr { align-self: center; }
+  .app-actions .btn { width: 100%; }
+}

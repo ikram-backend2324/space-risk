@@ -1,3 +1,4 @@
+import io
 import json
 import logging
 from urllib.parse import urlparse
@@ -7,7 +8,7 @@ from django.core.cache import cache
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
-from django.http import JsonResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
@@ -27,6 +28,36 @@ def _throttled(request, action, seconds):
         return True
     cache.set(key, 1, seconds)
     return False
+
+
+def download_android(request):
+    """Serve the Android APK as a real file download (Chrome, Yandex, Edge, Firefox, Safari…)."""
+    path = settings.ANDROID_APK_PATH
+    if not path.exists():
+        raise Http404("APK not found")
+    response = FileResponse(open(path, "rb"), as_attachment=True,
+                            filename=f"SPACE-RISK-{settings.ANDROID_APK_VERSION}.apk",
+                            content_type="application/vnd.android.package-archive")
+    response["Cache-Control"] = "no-cache"
+    response["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
+QR_TARGETS = {"telegram": lambda r: settings.TELEGRAM_BOT_URL, "android": lambda r: r.build_absolute_uri("/download/android/")}
+
+
+def qr_code(request, target):
+    """QR code (SVG) for the Telegram bot or the APK download link — dark modules on white, so every camera can read it."""
+    import segno
+
+    make = QR_TARGETS.get(target)
+    if make is None:
+        raise Http404
+    buf = io.BytesIO()
+    segno.make(make(request), error="m").save(buf, kind="svg", scale=8, border=2, dark="#0b1230", light="#ffffff", xmldecl=False, svgns=True)
+    response = HttpResponse(buf.getvalue(), content_type="image/svg+xml")
+    response["Cache-Control"] = "public, max-age=86400"
+    return response
 
 
 def _regions_payload():

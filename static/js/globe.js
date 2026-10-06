@@ -307,7 +307,7 @@ export function createGlobe(container, opts = {}) {
       camera.position.setLength(startDist + (distance - startDist) * k);
     }
     // Pause auto-rotation while hovering/touching (and briefly after a touch) so regions are easy to tap.
-    if (!hovered && !touching && performance.now() - lastTouch > 2500) spin.rotation.y += o.autoRotate;
+    if (!hovered && !touching && performance.now() - lastTouch > 2500) spin.rotation.y += o.autoRotate * dt * 60;   // frame-rate independent (autoRotate = radians per 60 Hz frame)
 
     markers.forEach((m) => {
       const s = ((t * 0.6 + m.phase) % 1);

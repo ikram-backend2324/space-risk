@@ -8,11 +8,13 @@ function labelSprite(text, sub, color) {
   const g = c.getContext("2d");
   const dark = document.documentElement.dataset.theme !== "light";
   const head = ["ru", "kaa"].includes(document.documentElement.lang) ? "'Inter'" : "'Space Grotesk', 'Inter'";
-  g.font = `600 44px ${head}, sans-serif`;
+  // Shrink long names (e.g. Russian / Karakalpak region names) so they never get cut off.
+  const fit = (weight, px, str) => { g.font = `${weight} ${px}px ${head}, sans-serif`; while (px > 22 && g.measureText(str).width > 496) { px -= 2; g.font = `${weight} ${px}px ${head}, sans-serif`; } };
+  fit(600, 44, text);
   g.textAlign = "center";
   g.fillStyle = dark ? "#e8ecff" : "#0b1230";
   g.fillText(text, 256, 62);
-  g.font = `700 52px ${head}, sans-serif`;
+  fit(700, 52, sub);
   g.fillStyle = color;
   g.fillText(sub, 256, 128);
   const t = new THREE.CanvasTexture(c);
@@ -22,7 +24,11 @@ function labelSprite(text, sub, color) {
   return s;
 }
 
-export function createRiskTowers(el, bars, score, coreColor) {
+export function createRiskTowers(el, bars, score, coreColor, opts = {}) {
+  // opts.radius: tower ring radius (more bars → wider ring); opts.labelScale: label size multiplier;
+  // opts.labelTop: only the N highest towers carry a name (the rest show just the score) so labels never pile up.
+  const R = opts.radius || 2.25;
+  const k = R / 2.25;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -45,7 +51,7 @@ export function createRiskTowers(el, bars, score, coreColor) {
   // platform with concentric rings
   const base = new THREE.Group();
   const discMat = new THREE.MeshStandardMaterial({ transparent: true, metalness: 0.6, roughness: 0.5 });
-  const disc = new THREE.Mesh(new THREE.CircleGeometry(3.4, 96), discMat);
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(3.4 * k, 96), discMat);
   const themeDisc = () => {
     const dark = document.documentElement.dataset.theme !== "light";
     discMat.color.set(dark ? 0x0e1533 : 0xdbe4ff);
@@ -56,7 +62,7 @@ export function createRiskTowers(el, bars, score, coreColor) {
   disc.rotation.x = -Math.PI / 2;
   base.add(disc);
   [1.2, 2.2, 3.2].forEach((r, i) => {
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.008, 6, 160), new THREE.MeshBasicMaterial({ color: i === 2 ? 0x8b5cf6 : 0x22d3ee, transparent: true, opacity: 0.45 }));
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(r * k, 0.008, 6, 160), new THREE.MeshBasicMaterial({ color: i === 2 ? 0x8b5cf6 : 0x22d3ee, transparent: true, opacity: 0.45 }));
     ring.rotation.x = Math.PI / 2;
     base.add(ring);
   });
@@ -74,7 +80,7 @@ export function createRiskTowers(el, bars, score, coreColor) {
 
   // towers
   const towers = [];
-  const R = 2.25;
+  const named = new Set([...bars].sort((a, b) => b.score - a.score).slice(0, opts.labelTop || bars.length));
   bars.forEach((b, i) => {
     const a = (i / bars.length) * Math.PI * 2;
     const h = Math.max(0.15, (b.score / 100) * 3);
@@ -86,7 +92,8 @@ export function createRiskTowers(el, bars, score, coreColor) {
     mesh.scale.y = 0.001;
     const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35 }));
     mesh.add(edges);
-    let label = labelSprite(b.label, String(b.score), b.color);
+    let label = labelSprite(named.has(b) ? b.label : "", String(b.score), b.color);
+    if (opts.labelScale) label.scale.multiplyScalar(opts.labelScale);
     label.position.set(mesh.position.x * 1.12, h + 0.45, mesh.position.z * 1.12);
     label.material.opacity = 0;
     // data link from core to tower top
@@ -99,7 +106,7 @@ export function createRiskTowers(el, bars, score, coreColor) {
   // Re-draw label textures when the theme changes (text colour depends on it).
   addEventListener("themechange", () => {
     towers.forEach((tw) => {
-      const fresh = labelSprite(tw.bar.label, String(tw.bar.score), tw.bar.color);
+      const fresh = labelSprite(named.has(tw.bar) ? tw.bar.label : "", String(tw.bar.score), tw.bar.color);
       tw.label.material.map.dispose();
       tw.label.material.map = fresh.material.map;
       tw.label.material.needsUpdate = true;
@@ -122,7 +129,7 @@ export function createRiskTowers(el, bars, score, coreColor) {
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     // Narrow (phone) viewports: pull the camera back so side labels stay in frame.
-    const dist = 8.9 * Math.max(1, Math.pow(1.6 / camera.aspect, 0.55));
+    const dist = 8.9 * (1 + (k - 1) * 0.55) * Math.max(1, Math.pow(1.6 / camera.aspect, 0.55));
     const dir = camera.position.clone().sub(controls.target).normalize();
     camera.position.copy(controls.target).add(dir.multiplyScalar(dist));
     controls.maxDistance = Math.max(13, dist * 1.4);

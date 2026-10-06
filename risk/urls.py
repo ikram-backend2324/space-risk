@@ -14,4 +14,6 @@ urlpatterns = [
     path("predictions/<int:pk>/delete/", views.delete, name="delete"),
     path("predictions/<int:pk>/ask/", views.ask, name="ask"),
     path("api/regions/", views.regions_api, name="regions_api"),
+    path("download/android/", views.download_android, name="download_android"),
+    path("qr/<str:target>.svg", views.qr_code, name="qr"),
 ]

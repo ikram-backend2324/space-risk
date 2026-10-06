@@ -1,0 +1,36 @@
+{% load static %}
+<div class="grid grid-2 apps-grid">
+  <div class="card tilt app-card reveal" style="--c:#229ED9">
+    <div class="app-head">
+      <div class="app-ic" style="background:linear-gradient(135deg,#2AABEE,#229ED9)"><i data-lucide="send"></i></div>
+      <div><h3>{% t "apps.tg_title" %}</h3><a class="muted small app-handle" href="{{ TELEGRAM_BOT_URL }}" target="_blank" rel="noopener">{{ TELEGRAM_BOT_NAME }}</a></div>
+    </div>
+    <p class="muted">{% t "apps.tg_text" %}</p>
+    <div class="app-body">
+      <a class="qr" href="{{ TELEGRAM_BOT_URL }}" target="_blank" rel="noopener">
+        <img src="{% url 'risk:qr' 'telegram' %}" alt="{% t 'apps.qr_alt_tg' %}" width="150" height="150" loading="lazy">
+      </a>
+      <div class="app-actions">
+        <a class="btn btn-primary btn-tg" href="{{ TELEGRAM_BOT_URL }}" target="_blank" rel="noopener"><i data-lucide="send"></i>{% t "apps.tg_button" %}</a>
+        <span class="muted small"><i data-lucide="scan-line"></i> {% t "apps.scan" %}</span>
+      </div>
+    </div>
+  </div>
+  <div class="card tilt app-card reveal d1" style="--c:#3DDC84">
+    <div class="app-head">
+      <div class="app-ic" style="background:linear-gradient(135deg,#3DDC84,#16a34a)"><i data-lucide="smartphone"></i></div>
+      <div><h3>{% t "apps.android_title" %}</h3><span class="muted small">{% t "apps.apk_meta" size=APK_SIZE_MB %}</span></div>
+    </div>
+    <p class="muted">{% t "apps.android_text" %}</p>
+    <div class="app-body">
+      <a class="qr" href="{% url 'risk:download_android' %}">
+        <img src="{% url 'risk:qr' 'android' %}" alt="{% t 'apps.qr_alt_apk' %}" width="150" height="150" loading="lazy">
+      </a>
+      <div class="app-actions">
+        <a class="btn btn-primary btn-android" href="{% url 'risk:download_android' %}" download><i data-lucide="download"></i>{% t "apps.download" %}</a>
+        <span class="muted small"><i data-lucide="scan-line"></i> {% t "apps.scan" %}</span>
+        <span class="muted small">{% t "apps.install_hint" %}</span>
+      </div>
+    </div>
+  </div>
+</div>

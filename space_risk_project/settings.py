@@ -129,6 +129,11 @@ OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
 # Optional stronger model for Karakalpak chat answers (small models mix it with Uzbek/Kazakh).
 OPENROUTER_MODEL_KAA = os.getenv("OPENROUTER_MODEL_KAA", "")
 OPENROUTER_TIMEOUT = int(os.getenv("OPENROUTER_TIMEOUT", "60"))
+
+# ---------------------------------------------------------------- mobile app & Telegram bot
+TELEGRAM_BOT_URL = os.getenv("TELEGRAM_BOT_URL", "https://t.me/Spacer_Risk_bot")
+ANDROID_APK_PATH = BASE_DIR / "downloads" / "SPACE-RISK.apk"
+ANDROID_APK_VERSION = os.getenv("ANDROID_APK_VERSION", "1.1")
 SITE_URL = os.getenv("SITE_URL", f"https://{RENDER_EXTERNAL_HOSTNAME}" if RENDER_EXTERNAL_HOSTNAME else "http://localhost:8000")
 
 LOGGING = {
