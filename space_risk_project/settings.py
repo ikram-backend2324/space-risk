@@ -133,7 +133,7 @@ OPENROUTER_TIMEOUT = int(os.getenv("OPENROUTER_TIMEOUT", "60"))
 # ---------------------------------------------------------------- mobile app & Telegram bot
 TELEGRAM_BOT_URL = os.getenv("TELEGRAM_BOT_URL", "https://t.me/Spacer_Risk_bot")
 ANDROID_APK_PATH = BASE_DIR / "downloads" / "SPACE-RISK.apk"
-ANDROID_APK_VERSION = os.getenv("ANDROID_APK_VERSION", "1.2")
+ANDROID_APK_VERSION = os.getenv("ANDROID_APK_VERSION", "1.3")
 SITE_URL = os.getenv("SITE_URL", f"https://{RENDER_EXTERNAL_HOSTNAME}" if RENDER_EXTERNAL_HOSTNAME else "http://localhost:8000")
 
 LOGGING = {
